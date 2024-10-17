@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mymoney/pages/add_page.dart';
 import 'package:mymoney/pages/home_page.dart';
 
 void main() {
@@ -12,7 +13,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: AddPage(),
     );
   }
 }
