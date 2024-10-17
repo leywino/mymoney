@@ -18,6 +18,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   Color displayColor = AppColors.lightYellow;
 
   void onButtonPressed(String value) {
+    if (FocusScope.of(context).hasFocus) {
+      FocusScope.of(context).unfocus();
+    }
+
     setState(() {
       if (value == 'C') {
         display = '0';
@@ -93,7 +97,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     final size = MediaQuery.of(context).size;
     return Column(
       children: [
-        Box.hBox4,
+        Box.h4,
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
@@ -125,14 +129,14 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   display,
                   maxLines: 1,
                   style: TextStyle(
-                    color: displayColor, // Dynamic color
+                    color: displayColor,
                     fontSize: 56,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.right,
                 ),
               ),
-              Box.wBox8,
+              Box.w8,
               InkWell(
                 splashColor: AppColors.customGray,
                 onTap: () {
@@ -153,13 +157,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             ],
           ),
         ),
-        Box.hBox4,
+        Box.h4,
         GridView.count(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           crossAxisCount: 4,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
+          mainAxisSpacing: 2,
+          crossAxisSpacing: 2,
           childAspectRatio: 5 / 4,
           children: [
             buildButton('+'),

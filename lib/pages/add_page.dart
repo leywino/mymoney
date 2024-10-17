@@ -54,85 +54,100 @@ class _AddPageState extends State<AddPage> {
   }
 
   Widget _buildBody() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Center(
-            child: ToggleButtons(
-              borderColor: AppColors.darkGray,
-              fillColor: AppColors.lightYellow,
-              selectedColor: AppColors.darkGray,
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(5),
-              isSelected: isSelected,
-              onPressed: (int index) {
-                setState(() {
-                  for (int buttonIndex = 0;
-                      buttonIndex < isSelected.length;
-                      buttonIndex++) {
-                    if (buttonIndex == index) {
-                      isSelected[buttonIndex] = true;
-                    } else {
-                      isSelected[buttonIndex] = false;
+    return GestureDetector(
+      onTap: () {
+        if (FocusScope.of(context).hasFocus) {
+          FocusScope.of(context).unfocus();
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Center(
+              child: ToggleButtons(
+                borderColor: AppColors.darkGray,
+                fillColor: AppColors.lightYellow,
+                selectedColor: AppColors.darkGray,
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(5),
+                isSelected: isSelected,
+                onPressed: (int index) {
+                  setState(() {
+                    for (int buttonIndex = 0;
+                        buttonIndex < isSelected.length;
+                        buttonIndex++) {
+                      if (buttonIndex == index) {
+                        isSelected[buttonIndex] = true;
+                      } else {
+                        isSelected[buttonIndex] = false;
+                      }
                     }
-                  }
-                });
-              },
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    children: [
-                      if (isSelected[0]) checkIcon(),
-                      const Text('INCOME'),
-                    ],
+                  });
+                },
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      children: [
+                        if (isSelected[0]) checkIcon(),
+                        const Text('INCOME'),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    children: [
-                      if (isSelected[1]) checkIcon(),
-                      const Text('EXPENSE'),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      children: [
+                        if (isSelected[1]) checkIcon(),
+                        const Text('EXPENSE'),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    children: [
-                      if (isSelected[2]) checkIcon(),
-                      const Text('TRANSFER'),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      children: [
+                        if (isSelected[2]) checkIcon(),
+                        const Text('TRANSFER'),
+                      ],
+                    ),
                   ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                buildCustomButton(
+                  context,
+                  title: _buildTitle(0),
+                  icon: Icons.credit_card,
+                  label: 'Account',
                 ),
+                Box.w4,
+                if (isSelected[2])
+                  buildCustomButton(
+                    context,
+                    title: _buildTitle(1),
+                    icon: Icons.credit_card,
+                    label: 'Account',
+                  )
+                else
+                  buildCustomButton(
+                    context,
+                    title: _buildTitle(1),
+                    icon: Icons.label,
+                    label: 'Category',
+                  ),
               ],
             ),
-          ),
-          Row(
-            children: [
-              buildCustomButton(
-                context,
-                title: _buildTitle(0),
-                icon: Icons.credit_card,
-                label: 'Account',
-              ),
-              Box.wBox4,
-              buildCustomButton(
-                context,
-                title: _buildTitle(1),
-                icon: Icons.label,
-                label: 'Category',
-              ),
-            ],
-          ),
-          Box.hBox4,
-          Expanded(child: buildNoteContainer()),
-          const CalculatorScreen(),
-          const DateTimePickerWidget(),
-        ],
+            Box.h4,
+            Expanded(child: buildNoteContainer()),
+            const CalculatorScreen(),
+            const DateTimePickerWidget(),
+          ],
+        ),
       ),
     );
   }
@@ -174,6 +189,7 @@ class _AddPageState extends State<AddPage> {
       child: const Padding(
         padding: EdgeInsets.all(12.0),
         child: TextField(
+          style: TextStyle(color: AppColors.lightYellow),
           maxLines: null,
           decoration: InputDecoration.collapsed(
               hintText: 'Add notes',
@@ -192,8 +208,8 @@ class _AddPageState extends State<AddPage> {
           Text(
             title,
             style: const TextStyle(
-              color: AppColors.lightYellow,
-              fontSize: 16,
+              color: AppColors.secondaryText,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -204,25 +220,28 @@ class _AddPageState extends State<AddPage> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.beige, width: 2),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    icon,
-                    color: AppColors.gold,
-                  ),
-                  Box.wBox3,
-                  Text(
-                    label,
-                    style: const TextStyle(
+            child: InkWell(
+              onTap: () {},
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
                       color: AppColors.lightYellow,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
                     ),
-                  ),
-                ],
+                    Box.w3,
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: AppColors.lightYellow,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mymoney/core/color.dart';
-import 'package:mymoney/core/constants.dart';
 
 class DateTimePickerWidget extends StatefulWidget {
   const DateTimePickerWidget({super.key});
@@ -98,34 +97,49 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: size.width * 0.2, vertical: 3),
+      padding: const EdgeInsets.only(top: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           // Date Picker
-          GestureDetector(
-            onTap: () => _selectDate(context),
-            child: Text(
-              getFormattedDate(),
-              style: const TextStyle(
-                color: AppColors.lightYellow,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+          Expanded(
+            child: InkWell(
+              onTap: () => _selectDate(context),
+              child: Container(
+                decoration: const BoxDecoration(
+                    border: Border(
+                        right: BorderSide(width: 1, color: AppColors.beige))),
+                child: Center(
+                  child: Text(
+                    getFormattedDate(),
+                    style: const TextStyle(
+                      color: AppColors.lightYellow,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
-          Box.wBox10,
-          GestureDetector(
-            onTap: () => _selectTime(context),
-            child: Text(
-              getFormattedTime(),
-              style: const TextStyle(
-                color: AppColors.lightYellow,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+          // Box.w10,
+          Expanded(
+            child: InkWell(
+              onTap: () => _selectTime(context),
+              child: Container(
+                decoration: const BoxDecoration(
+                    border: Border(
+                        left: BorderSide(width: 1, color: AppColors.beige))),
+                child: Center(
+                  child: Text(
+                    getFormattedTime(),
+                    style: const TextStyle(
+                      color: AppColors.lightYellow,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -133,11 +147,4 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: DateTimePickerWidget(),
-  ));
 }
