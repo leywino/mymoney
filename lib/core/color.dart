@@ -8,4 +8,6 @@ class AppColors {
   static const Color beige = Color(0xFFADA98B);
   static const Color customGray = Color(0xFF848272);
   static const Color secondaryText = Color(0xFFA49F84);
+  static const Color grayBrown = Color(0xFF5C5B55);
+  static const Color lightBeige = Color(0xFFBFB999);
 }

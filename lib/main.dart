@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mymoney/pages/add_page.dart';
+import 'package:flutter/services.dart';
 import 'package:mymoney/pages/home_page.dart';
 
 void main() {
@@ -11,9 +11,14 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AddPage(),
+      theme: ThemeData(fontFamily: 'Poppins'),
+      home: const HomePage(),
     );
   }
 }

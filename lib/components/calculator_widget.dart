@@ -4,7 +4,9 @@ import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
 
 class CalculatorScreen extends StatefulWidget {
-  const CalculatorScreen({super.key});
+  const CalculatorScreen({super.key, required this.onCalculate});
+
+  final Function(double) onCalculate;
 
   @override
   State<CalculatorScreen> createState() => _CalculatorScreenState();
@@ -86,6 +88,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       } else {
         display = result.toStringAsFixed(2);
       }
+
+      widget.onCalculate(double.parse(display));
 
       currentOperation = null;
       previousValue = null;

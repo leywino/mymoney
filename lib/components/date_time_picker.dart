@@ -3,7 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:mymoney/core/color.dart';
 
 class DateTimePickerWidget extends StatefulWidget {
-  const DateTimePickerWidget({super.key});
+  const DateTimePickerWidget({super.key, required this.onDateChanged});
+
+  final Function(String) onDateChanged;
 
   @override
   State<DateTimePickerWidget> createState() => _DateTimePickerWidgetState();
@@ -44,6 +46,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
       setState(() {
         selectedDate = picked;
       });
+      _combineDateAndTime();
     }
   }
 
@@ -76,6 +79,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
       setState(() {
         selectedTime = picked;
       });
+      _combineDateAndTime();
     }
   }
 
@@ -93,6 +97,17 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
       selectedTime.minute,
     );
     return DateFormat('h:mm a').format(dateTime);
+  }
+
+  void _combineDateAndTime() {
+    final String dateTimeString = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      selectedTime.hour,
+      selectedTime.minute,
+    ).toIso8601String();
+    widget.onDateChanged(dateTimeString);
   }
 
   @override

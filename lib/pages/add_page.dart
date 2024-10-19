@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mymoney/components/balance_text_widget.dart';
 import 'package:mymoney/components/calculator_widget.dart';
 import 'package:mymoney/components/date_time_picker.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
+import 'package:mymoney/core/database_helper.dart';
+import 'package:mymoney/models/account_model.dart';
 
 class AddPage extends StatefulWidget {
   const AddPage({super.key});
@@ -13,6 +16,69 @@ class AddPage extends StatefulWidget {
 
 class _AddPageState extends State<AddPage> {
   List<bool> isSelected = [false, true, false];
+  String? selectedDateAndTime;
+  double? amount;
+
+  Future<int> _showAccountSelection() async {
+    final dbHelper = DatabaseHelper();
+    List<Account> accounts = await dbHelper.getAllAccounts();
+    if (!mounted) return -1;
+    final result = await showModalBottomSheet(
+      backgroundColor: AppColors.grayBrown,
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Select Account',
+                style: TextStyle(color: AppColors.lightYellow, fontSize: 20),
+              ),
+              const SizedBox(height: 8.0),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: accounts.length,
+                itemBuilder: (context, index) {
+                  Account account = accounts[index];
+                  return ListTile(
+                    leading: Image.asset(
+                        height: 30,
+                        accountIconAssetPathList[account.iconNumber!]),
+                    title: Text(
+                      account.name,
+                      style: const TextStyle(
+                        color: AppColors.lightYellow,
+                      ),
+                    ),
+                    trailing: BalanceTextWidget(
+                      balance: account.balance,
+                      fontSize: 16,
+                    ),
+                    onTap: () {
+                      Navigator.pop(context, [account.id]);
+                    },
+                  );
+                },
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Add New Account'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (result != null && result.isNotEmpty) {
+      return result.first;
+    } else {
+      return -1;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +92,7 @@ class _AddPageState extends State<AddPage> {
 
   AppBar _buildAppBar() {
     return AppBar(
+      automaticallyImplyLeading: false,
       backgroundColor: AppColors.darkGray,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -37,7 +104,9 @@ class _AddPageState extends State<AddPage> {
               'CANCEL',
             ),
             icon: const Icon(Icons.close),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
           TextButton.icon(
             style: const ButtonStyle(
@@ -119,12 +188,12 @@ class _AddPageState extends State<AddPage> {
             ),
             Row(
               children: [
-                buildCustomButton(
-                  context,
-                  title: _buildTitle(0),
-                  icon: Icons.credit_card,
-                  label: 'Account',
-                ),
+                buildCustomButton(context,
+                    title: _buildTitle(0),
+                    icon: Icons.credit_card,
+                    label: 'Account', onTap: () {
+                  _showAccountSelection();
+                }),
                 Box.w4,
                 if (isSelected[2])
                   buildCustomButton(
@@ -144,8 +213,16 @@ class _AddPageState extends State<AddPage> {
             ),
             Box.h4,
             Expanded(child: buildNoteContainer()),
-            const CalculatorScreen(),
-            const DateTimePickerWidget(),
+            CalculatorScreen(
+              onCalculate: (amount) => setState(() {
+                this.amount = amount;
+              }),
+            ),
+            DateTimePickerWidget(
+              onDateChanged: (selectedDateAndTime) => setState(() {
+                this.selectedDateAndTime = selectedDateAndTime;
+              }),
+            ),
           ],
         ),
       ),
@@ -200,7 +277,10 @@ class _AddPageState extends State<AddPage> {
   }
 
   Widget buildCustomButton(BuildContext context,
-      {required String title, required IconData icon, required String label}) {
+      {required String title,
+      required IconData icon,
+      required String label,
+      Function()? onTap}) {
     return Expanded(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -221,7 +301,7 @@ class _AddPageState extends State<AddPage> {
               border: Border.all(color: AppColors.beige, width: 2),
             ),
             child: InkWell(
-              onTap: () {},
+              onTap: onTap,
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Row(
