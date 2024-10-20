@@ -1,23 +1,39 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
 
 class CalculatorScreen extends StatefulWidget {
-  const CalculatorScreen({super.key, required this.onCalculate});
+  const CalculatorScreen({
+    super.key,
+    required this.onCalculate,
+  });
 
   final Function(double) onCalculate;
 
   @override
-  State<CalculatorScreen> createState() => _CalculatorScreenState();
+  State<CalculatorScreen> createState() => CalculatorScreenState();
 }
 
-class _CalculatorScreenState extends State<CalculatorScreen> {
+class CalculatorScreenState extends State<CalculatorScreen> {
   String display = '0';
   String? currentOperation;
   double? previousValue;
   bool isNewValue = false;
   Color displayColor = AppColors.lightYellow;
+
+  void changeDisplayColor() async {
+    HapticFeedback.heavyImpact();
+    setState(() {
+      displayColor = Colors.redAccent;
+    });
+    await Future.delayed(const Duration(milliseconds: 250));
+    setState(() {
+      displayColor = AppColors.lightYellow;
+    });
+  }
 
   void onButtonPressed(String value) {
     if (FocusScope.of(context).hasFocus) {
@@ -53,10 +69,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         } else {
           if (display.length < 10) {
             display = display == '0' ? value : display + value;
+            HapticFeedback.lightImpact();
+            widget.onCalculate(double.parse(display));
+          } else {
+            changeDisplayColor();
           }
         }
-        displayColor = AppColors.lightYellow; // Reset color for digits
-        HapticFeedback.lightImpact();
+        // displayColor = AppColors.lightYellow; // Reset color for digits
       }
     });
   }

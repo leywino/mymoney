@@ -1,4 +1,5 @@
 import 'package:mymoney/core/constants.dart';
+import 'package:mymoney/models/category_model.dart';
 import 'package:sqflite/sqflite.dart' hide Transaction;
 import 'package:path/path.dart';
 import '../models/account_model.dart';
@@ -52,10 +53,10 @@ class DatabaseHelper {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       accountId INTEGER,
       categoryId INTEGER,
-      title TEXT,
       amount REAL,
       date TEXT,
       type TEXT,
+      notes TEXT,
       FOREIGN KEY(accountId) REFERENCES accounts(id) ON DELETE CASCADE,
       FOREIGN KEY(categoryId) REFERENCES categories(id) ON DELETE CASCADE
     )
@@ -95,9 +96,50 @@ class DatabaseHelper {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getCategoriesByType(String type) async {
+    final db = await database;
+    return await db.query(
+      'categories',
+      where: 'type = ?',
+      whereArgs: [type],
+    );
+  }
+
   Future<int> insertAccount(Account account) async {
     final db = await database;
     return await db.insert('accounts', account.toMap());
+  }
+
+  Future<Category?> getCategoryWithId(int categoryId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'categories',
+      where: 'id = ?',
+      whereArgs: [categoryId],
+      limit: 1,
+    );
+
+    if (maps.isNotEmpty) {
+      return Category.fromMap(maps.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<Account?> getAccountWithId(int accountId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'accounts',
+      where: 'id = ?',
+      whereArgs: [accountId],
+      limit: 1,
+    );
+
+    if (maps.isNotEmpty) {
+      return Account.fromMap(maps.first);
+    } else {
+      return null;
+    }
   }
 
   Future<List<Account>> getAllAccounts() async {
@@ -129,6 +171,16 @@ class DatabaseHelper {
       'transactions',
       where: 'accountId = ?',
       whereArgs: [accountId],
+    );
+    return List.generate(maps.length, (i) {
+      return Transaction.fromMap(maps[i]);
+    });
+  }
+
+  Future<List<Transaction>> getAllTransactions() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'transactions',
     );
     return List.generate(maps.length, (i) {
       return Transaction.fromMap(maps[i]);

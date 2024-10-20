@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mymoney/components/date_range_picker.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/pages/add_page.dart';
+import 'package:mymoney/pages/records_page.dart';
 import 'package:page_transition/page_transition.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,7 +17,7 @@ class _HomePageState extends State<HomePage> {
 
   // Placeholder widgets for the different pages
   static const List<Widget> _pages = <Widget>[
-    Text('Records Page'),
+    RecordsPage(),
     Text('Analysis Page'),
     Text('Budgets Page'),
     Text('Accounts Page'),
@@ -35,7 +37,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: AppColors.darkGray,
       appBar: AppBar(
         backgroundColor: AppColors.darkGray,
-        // title: const Text('Money Logging App'),
+        title: const DateRangePicker(),
       ),
       body: Center(
         child: _pages.elementAt(_selectedIndex),

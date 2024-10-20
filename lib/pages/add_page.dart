@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mymoney/components/balance_text_widget.dart';
 import 'package:mymoney/components/calculator_widget.dart';
 import 'package:mymoney/components/date_time_picker.dart';
@@ -6,6 +9,8 @@ import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
 import 'package:mymoney/core/database_helper.dart';
 import 'package:mymoney/models/account_model.dart';
+import 'package:mymoney/models/category_model.dart';
+import 'package:mymoney/models/transaction_model.dart';
 
 class AddPage extends StatefulWidget {
   const AddPage({super.key});
@@ -18,11 +23,17 @@ class _AddPageState extends State<AddPage> {
   List<bool> isSelected = [false, true, false];
   String? selectedDateAndTime;
   double? amount;
+  Account? firstAccount;
+  Account? secondAccount;
+  Category? category;
+  final TextEditingController _noteController = TextEditingController();
+  final GlobalKey<CalculatorScreenState> _calculatorGlobalKey =
+      GlobalKey<CalculatorScreenState>();
 
-  Future<int> _showAccountSelection() async {
+  Future<Account?> _showAccountSelection() async {
     final dbHelper = DatabaseHelper();
     List<Account> accounts = await dbHelper.getAllAccounts();
-    if (!mounted) return -1;
+    if (!mounted) return null;
     final result = await showModalBottomSheet(
       backgroundColor: AppColors.grayBrown,
       context: context,
@@ -57,7 +68,7 @@ class _AddPageState extends State<AddPage> {
                       fontSize: 16,
                     ),
                     onTap: () {
-                      Navigator.pop(context, [account.id]);
+                      Navigator.pop(context, [account]);
                     },
                   );
                 },
@@ -76,8 +87,104 @@ class _AddPageState extends State<AddPage> {
     if (result != null && result.isNotEmpty) {
       return result.first;
     } else {
-      return -1;
+      return null;
     }
+  }
+
+  Future<Category?> _showCategorySelection(String type) async {
+    final dbHelper = DatabaseHelper();
+    List<Map<String, dynamic>> categories =
+        await dbHelper.getCategoriesByType(type);
+
+    if (!mounted) return null;
+
+    final result = await showModalBottomSheet(
+      backgroundColor: AppColors.grayBrown,
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.8,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Text(
+                  'Select Category ($type)',
+                  style: const TextStyle(
+                      color: AppColors.lightYellow, fontSize: 20),
+                ),
+                const SizedBox(height: 8.0),
+                Expanded(
+                  child: GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      childAspectRatio: 0.9,
+                      mainAxisSpacing: 10.0,
+                      crossAxisSpacing: 10.0,
+                    ),
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> categoryMap = categories[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Category category = Category(
+                              name: categoryMap['name'],
+                              assetPath: categoryMap['assetPath'],
+                              type: categoryMap['type'],
+                              id: categoryMap['id']);
+                          Navigator.pop(context, [category]);
+                        },
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              categoryMap['assetPath'],
+                              height: 40,
+                            ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              categoryMap['name'],
+                              style: const TextStyle(
+                                color: AppColors.lightYellow,
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Box.h12,
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (result != null && result.isNotEmpty) {
+      return result.first;
+    } else {
+      return null;
+    }
+  }
+
+  @override
+  void initState() {
+    selectedDateAndTime = DateTime.now().toIso8601String();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
   }
 
   @override
@@ -114,7 +221,9 @@ class _AddPageState extends State<AddPage> {
             label: const Text(
               'SAVE',
             ),
-            onPressed: () {},
+            onPressed: () {
+              _saveTransaction();
+            },
             icon: const Icon(Icons.check),
           ),
         ],
@@ -188,26 +297,57 @@ class _AddPageState extends State<AddPage> {
             ),
             Row(
               children: [
-                buildCustomButton(context,
-                    title: _buildTitle(0),
-                    icon: Icons.credit_card,
-                    label: 'Account', onTap: () {
-                  _showAccountSelection();
-                }),
+                buildCustomButton(
+                  context,
+                  title: _buildTitle(0),
+                  icon: firstAccount == null
+                      ? const Icon(
+                          Icons.credit_card,
+                          color: AppColors.lightYellow,
+                        )
+                      : Image.asset(
+                          accountIconAssetPathList[firstAccount!.iconNumber!]),
+                  label: firstAccount == null ? 'Account' : firstAccount!.name,
+                  onTap: () async {
+                    Account? account = await _showAccountSelection();
+                    if (account != null) {
+                      setState(() {
+                        firstAccount = account;
+                      });
+                    }
+                  },
+                ),
                 Box.w4,
                 if (isSelected[2])
                   buildCustomButton(
                     context,
                     title: _buildTitle(1),
-                    icon: Icons.credit_card,
+                    icon: const Icon(
+                      Icons.credit_card,
+                      color: AppColors.lightYellow,
+                    ),
                     label: 'Account',
                   )
                 else
                   buildCustomButton(
+                    onTap: () async {
+                      Category? category = await _showCategorySelection(
+                          isSelected[0] ? 'income' : 'expense');
+                      if (category != null) {
+                        setState(() {
+                          this.category = category;
+                        });
+                      }
+                    },
                     context,
                     title: _buildTitle(1),
-                    icon: Icons.label,
-                    label: 'Category',
+                    icon: category == null
+                        ? const Icon(
+                            Icons.label,
+                            color: AppColors.lightYellow,
+                          )
+                        : Image.asset(category!.assetPath),
+                    label: category == null ? 'Category' : category!.name,
                   ),
               ],
             ),
@@ -263,12 +403,13 @@ class _AddPageState extends State<AddPage> {
         border: Border.all(color: AppColors.beige, width: 2),
         color: AppColors.oliveGray,
       ),
-      child: const Padding(
-        padding: EdgeInsets.all(12.0),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
         child: TextField(
-          style: TextStyle(color: AppColors.lightYellow),
+          controller: _noteController,
+          style: const TextStyle(color: AppColors.lightYellow),
           maxLines: null,
-          decoration: InputDecoration.collapsed(
+          decoration: const InputDecoration.collapsed(
               hintText: 'Add notes',
               hintStyle: TextStyle(color: AppColors.beige)),
         ),
@@ -278,7 +419,7 @@ class _AddPageState extends State<AddPage> {
 
   Widget buildCustomButton(BuildContext context,
       {required String title,
-      required IconData icon,
+      required Widget icon,
       required String label,
       Function()? onTap}) {
     return Expanded(
@@ -307,10 +448,7 @@ class _AddPageState extends State<AddPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      icon,
-                      color: AppColors.lightYellow,
-                    ),
+                    SizedBox(height: 22, width: 22, child: icon),
                     Box.w3,
                     Text(
                       label,
@@ -328,5 +466,45 @@ class _AddPageState extends State<AddPage> {
         ],
       ),
     );
+  }
+
+  void _saveTransfer() {}
+
+  void _saveTransaction() {
+    if (firstAccount == null) {
+      Fluttertoast.showToast(
+        msg: 'please select an account',
+        backgroundColor: AppColors.beige,
+        textColor: AppColors.lightYellow,
+      );
+      return;
+    }
+    if (category == null) {
+      Fluttertoast.showToast(
+        msg: 'please select a category',
+        backgroundColor: AppColors.beige,
+        textColor: AppColors.lightYellow,
+      );
+      return;
+    }
+    if (amount == null || amount == 0) {
+      if (_calculatorGlobalKey.currentState != null) {
+        _calculatorGlobalKey.currentState!.changeDisplayColor();
+      }
+      Fluttertoast.showToast(
+        msg: 'please enter amount',
+        backgroundColor: AppColors.beige,
+        textColor: AppColors.lightYellow,
+      );
+      return;
+    }
+    final dbHelper = DatabaseHelper();
+    Transaction transaction = Transaction(
+      accountId: firstAccount!.id!,
+      categoryId: category!.id!,
+      amount: amount!,
+      date: selectedDateAndTime!,
+    );
+    dbHelper.insertTransaction(transaction);
   }
 }

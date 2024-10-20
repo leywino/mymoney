@@ -1,31 +1,39 @@
 class Transaction {
   final int? id;
-  final String title;
+  final int accountId;
+  final int categoryId;
   final double amount;
   final String date;
+  final String? notes;
 
   Transaction({
     this.id,
-    required this.title,
+    required this.accountId,
+    required this.categoryId,
     required this.amount,
     required this.date,
+    this.notes,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'title': title,
+      'accountId': accountId,
+      'categoryId': categoryId,
       'amount': amount,
       'date': date,
+      'notes': notes,
     };
   }
 
   factory Transaction.fromMap(Map<String, dynamic> map) {
     return Transaction(
       id: map['id'],
-      title: map['title'],
+      accountId: map['accountId'],
+      categoryId: map['categoryId'],
       amount: map['amount'],
       date: map['date'],
+      notes: map['notes'],
     );
   }
 }
