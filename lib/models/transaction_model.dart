@@ -5,6 +5,7 @@ class Transaction {
   final double amount;
   final String date;
   final String? notes;
+  final String type;
 
   Transaction({
     this.id,
@@ -12,6 +13,7 @@ class Transaction {
     required this.categoryId,
     required this.amount,
     required this.date,
+    required this.type,
     this.notes,
   });
 
@@ -23,6 +25,7 @@ class Transaction {
       'amount': amount,
       'date': date,
       'notes': notes,
+      'type': type,
     };
   }
 
@@ -34,6 +37,7 @@ class Transaction {
       amount: map['amount'],
       date: map['date'],
       notes: map['notes'],
+      type: map['type'],
     );
   }
 }

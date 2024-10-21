@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: AppColors.darkGray,
       appBar: AppBar(
         backgroundColor: AppColors.darkGray,
-        title: const DateRangePicker(),
+        title: _buildAppBar(),
       ),
       body: Center(
         child: _pages.elementAt(_selectedIndex),
@@ -107,5 +107,21 @@ class _HomePageState extends State<HomePage> {
             duration: const Duration(milliseconds: 350),
             type: PageTransitionType.rightToLeft,
             child: const AddPage()));
+  }
+
+  Widget? _buildAppBar() {
+    switch (_selectedIndex) {
+      case 0:
+        return const DateRangePicker();
+      case 1:
+        return const DateRangePicker();
+      case 2:
+        return null;
+      case 3:
+        return null;
+      case 4:
+        return null;
+    }
+    return null;
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mymoney/components/balance_text_widget.dart';
@@ -270,7 +268,7 @@ class _AddPageState extends State<AddPage> {
                     child: Row(
                       children: [
                         if (isSelected[0]) checkIcon(),
-                        const Text('INCOME'),
+                        Text(_buildTrasactionType()),
                       ],
                     ),
                   ),
@@ -279,7 +277,7 @@ class _AddPageState extends State<AddPage> {
                     child: Row(
                       children: [
                         if (isSelected[1]) checkIcon(),
-                        const Text('EXPENSE'),
+                        Text(_buildTrasactionType()),
                       ],
                     ),
                   ),
@@ -288,7 +286,7 @@ class _AddPageState extends State<AddPage> {
                     child: Row(
                       children: [
                         if (isSelected[2]) checkIcon(),
-                        const Text('TRANSFER'),
+                        Text(_buildTrasactionType()),
                       ],
                     ),
                   ),
@@ -468,7 +466,7 @@ class _AddPageState extends State<AddPage> {
     );
   }
 
-  void _saveTransfer() {}
+  // void _saveTransfer() {}
 
   void _saveTransaction() {
     if (firstAccount == null) {
@@ -500,11 +498,25 @@ class _AddPageState extends State<AddPage> {
     }
     final dbHelper = DatabaseHelper();
     Transaction transaction = Transaction(
-      accountId: firstAccount!.id!,
-      categoryId: category!.id!,
-      amount: amount!,
-      date: selectedDateAndTime!,
-    );
+        accountId: firstAccount!.id!,
+        categoryId: category!.id!,
+        amount: amount!,
+        date: selectedDateAndTime!,
+        type: _buildTrasactionType());
     dbHelper.insertTransaction(transaction);
+    Navigator.pop(context);
+  }
+
+  String _buildTrasactionType() {
+    if (isSelected[0]) {
+      return "INCOME";
+    }
+    if (isSelected[1]) {
+      return "EXPENSE";
+    }
+    if (isSelected[2]) {
+      return "TRANSFER";
+    }
+    return "EXPENSE";
   }
 }
