@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:mymoney/components/date_range_picker.dart';
 import 'package:mymoney/core/color.dart';
+import 'package:mymoney/pages/accounts_page.dart';
 import 'package:mymoney/pages/add_page.dart';
 import 'package:mymoney/pages/records_page.dart';
 import 'package:page_transition/page_transition.dart';
@@ -14,15 +16,48 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  bool _isFabVisible = true;
+  final ScrollController _scrollController = ScrollController();
 
   // Placeholder widgets for the different pages
-  static const List<Widget> _pages = <Widget>[
-    RecordsPage(),
-    Text('Analysis Page'),
-    Text('Budgets Page'),
-    Text('Accounts Page'),
-    Text('Categories Page'),
-  ];
+  List<Widget> _pages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Add listener to ScrollController
+    _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        if (_isFabVisible) {
+          setState(() {
+            _isFabVisible = false;
+          });
+        }
+      } else if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        if (!_isFabVisible) {
+          setState(() {
+            _isFabVisible = true;
+          });
+        }
+      }
+    });
+
+    _pages = <Widget>[
+      RecordsPage(scrollController: _scrollController),
+      const Text('Analysis Page'),
+      const Text('Budgets Page'),
+      AccountsPage(scrollController: _scrollController),
+      const Text('Categories Page'),
+    ];
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -42,22 +77,28 @@ class _HomePageState extends State<HomePage> {
       body: Center(
         child: _pages.elementAt(_selectedIndex),
       ),
-      floatingActionButton: IconButton(
-        onPressed: () {
-          _navigateToAddPage();
-        },
-        icon: Container(
-          height: size.height * 0.06,
-          width: size.height * 0.06,
-          decoration: const BoxDecoration(
-            color: AppColors.grayBrown,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.add,
-            color: AppColors.lightYellow,
-          ),
-        ),
+      floatingActionButton: AnimatedOpacity(
+        duration: const Duration(milliseconds: 300),
+        opacity: _isFabVisible ? 1.0 : 0.0,
+        child: _isFabVisible
+            ? IconButton(
+                onPressed: () {
+                  _navigateToAddPage();
+                },
+                icon: Container(
+                  height: size.height * 0.06,
+                  width: size.height * 0.06,
+                  decoration: const BoxDecoration(
+                    color: AppColors.grayBrown,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    color: AppColors.lightYellow,
+                  ),
+                ),
+              )
+            : null,
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

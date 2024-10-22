@@ -54,7 +54,7 @@ class _AddPageState extends State<AddPage> {
                   return ListTile(
                     leading: Image.asset(
                         height: 30,
-                        accountIconAssetPathList[account.iconNumber!]),
+                        accountsAssetIconList[account.iconNumber!]),
                     title: Text(
                       account.name,
                       style: const TextStyle(
@@ -304,7 +304,7 @@ class _AddPageState extends State<AddPage> {
                           color: AppColors.lightYellow,
                         )
                       : Image.asset(
-                          accountIconAssetPathList[firstAccount!.iconNumber!]),
+                          accountsAssetIconList[firstAccount!.iconNumber!]),
                   label: firstAccount == null ? 'Account' : firstAccount!.name,
                   onTap: () async {
                     Account? account = await _showAccountSelection();
@@ -496,6 +496,9 @@ class _AddPageState extends State<AddPage> {
       );
       return;
     }
+    if (isSelected[1]) {
+      amount = 0 - amount!;
+    }
     final dbHelper = DatabaseHelper();
     Transaction transaction = Transaction(
         accountId: firstAccount!.id!,
@@ -504,6 +507,7 @@ class _AddPageState extends State<AddPage> {
         date: selectedDateAndTime!,
         type: _buildTrasactionType());
     dbHelper.insertTransaction(transaction);
+    dbHelper.updateAccountBalance(firstAccount!.id!, amount!);
     Navigator.pop(context);
   }
 

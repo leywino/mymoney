@@ -8,12 +8,14 @@ class BalanceTextWidget extends StatelessWidget {
     required this.balance,
     this.fontSize,
     this.isSymbol = false,
+    this.isMinusOnly = false,
     this.style,
   });
 
   final double balance;
   final double? fontSize;
   final bool isSymbol;
+  final bool isMinusOnly;
   final TextStyle? style;
 
   @override
@@ -40,6 +42,9 @@ class BalanceTextWidget extends StatelessWidget {
     String formatted = formatter.format(balance.abs());
     if (isSymbol) {
       final String sign = balance < 0 ? "-" : "+";
+      formatted = "$sign$formatted";
+    } if(isMinusOnly){
+      final String sign = balance < 0 ? "-" : "";
       formatted = "$sign$formatted";
     }
 

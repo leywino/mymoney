@@ -150,7 +150,50 @@ class DatabaseHelper {
     });
   }
 
-  Future<void> updateAccountBalance(int accountId, double newBalance) async {
+  Future<double> getAccountBalance(int accountId) async {
+    final db = await database;
+
+    // Query the account by its ID
+    final List<Map<String, dynamic>> result = await db.query(
+      'accounts',
+      columns: ['balance'],
+      where: 'id = ?',
+      whereArgs: [accountId],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first['balance'] as double;
+    } else {
+      throw Exception('Account not found');
+    }
+  }
+
+  Future<void> updateAccountBalance(int accountId, double amount) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      final List<Map<String, dynamic>> result = await txn.query(
+        'accounts',
+        columns: ['balance'],
+        where: 'id = ?',
+        whereArgs: [accountId],
+        limit: 1,
+      );
+      if (result.isNotEmpty) {
+        final currentBalance = result.first['balance'] as double;
+        final newBalance = currentBalance + amount;
+        await txn.update(
+          'accounts',
+          {'balance': newBalance},
+          where: 'id = ?',
+          whereArgs: [accountId],
+        );
+      } else {
+        throw Exception('Account with ID $accountId not found');
+      }
+    });
+  }
+
+  Future<void> replaceAccountBalance(int accountId, double newBalance) async {
     final db = await database;
     await db.update(
       'accounts',

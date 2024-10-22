@@ -42,179 +42,190 @@ class Box {
   static const SizedBox w60 = SizedBox(width: 60);
 }
 
-const List<String> accountIconAssetPathList = [
-  "assets/icons/account/cash.png",
-  "assets/icons/account/card.png",
-  "assets/icons/account/savings.png"
+List<String> accountsAssetIconList = [
+  'assets/icons/account/cash.png',
+  'assets/icons/account/card.png',
+  'assets/icons/account/piggybank.png',
+  'assets/icons/account/bank.png',
+  'assets/icons/account/coins.png',
+  'assets/icons/account/federalbank.png',
+  'assets/icons/account/gold.png',
+  'assets/icons/account/hdfc.png',
+  'assets/icons/account/icici.png',
+  'assets/icons/account/mastercard.png',
+  'assets/icons/account/paypal.png',
+  'assets/icons/account/safe.png',
+  'assets/icons/account/visa.png',
+  'assets/icons/account/wallet.png',
 ];
 
 const List<Map<String, String>> expenseCategories = [
-      {
-        'name': 'Baby',
-        'assetPath': 'assets/icons/expense/baby.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Beauty',
-        'assetPath': 'assets/icons/expense/beauty.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Bicycle',
-        'assetPath': 'assets/icons/expense/bicycle.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Bike',
-        'assetPath': 'assets/icons/expense/bike.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Bills',
-        'assetPath': 'assets/icons/expense/bills.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Car',
-        'assetPath': 'assets/icons/expense/car.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Clothing',
-        'assetPath': 'assets/icons/expense/clothing.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Education',
-        'assetPath': 'assets/icons/expense/education.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Electronics',
-        'assetPath': 'assets/icons/expense/electronics.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'EMI',
-        'assetPath': 'assets/icons/expense/emi.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Entertainment',
-        'assetPath': 'assets/icons/expense/entertainment.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Food',
-        'assetPath': 'assets/icons/expense/food.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Gadgets',
-        'assetPath': 'assets/icons/expense/gadgets.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Gym',
-        'assetPath': 'assets/icons/expense/gym.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Health',
-        'assetPath': 'assets/icons/expense/health.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Home',
-        'assetPath': 'assets/icons/expense/home.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Insurance',
-        'assetPath': 'assets/icons/expense/insurance.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Shopping',
-        'assetPath': 'assets/icons/expense/shopping.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Social',
-        'assetPath': 'assets/icons/expense/social.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Sports',
-        'assetPath': 'assets/icons/expense/sports.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Subscriptions',
-        'assetPath': 'assets/icons/expense/subscriptions.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Tax',
-        'assetPath': 'assets/icons/expense/tax.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Telephone',
-        'assetPath': 'assets/icons/expense/telephone.png',
-        'type': 'expense'
-      },
-      {
-        'name': 'Transportation',
-        'assetPath': 'assets/icons/expense/transportation.png',
-        'type': 'expense'
-      },
-    ];
+  {
+    'name': 'Baby',
+    'assetPath': 'assets/icons/expense/baby.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Beauty',
+    'assetPath': 'assets/icons/expense/beauty.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Bicycle',
+    'assetPath': 'assets/icons/expense/bicycle.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Bike',
+    'assetPath': 'assets/icons/expense/bike.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Bills',
+    'assetPath': 'assets/icons/expense/bills.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Car',
+    'assetPath': 'assets/icons/expense/car.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Clothing',
+    'assetPath': 'assets/icons/expense/clothing.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Education',
+    'assetPath': 'assets/icons/expense/education.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Electronics',
+    'assetPath': 'assets/icons/expense/electronics.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'EMI',
+    'assetPath': 'assets/icons/expense/emi.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Entertainment',
+    'assetPath': 'assets/icons/expense/entertainment.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Food',
+    'assetPath': 'assets/icons/expense/food.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Gadgets',
+    'assetPath': 'assets/icons/expense/gadgets.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Gym',
+    'assetPath': 'assets/icons/expense/gym.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Health',
+    'assetPath': 'assets/icons/expense/health.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Home',
+    'assetPath': 'assets/icons/expense/home.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Insurance',
+    'assetPath': 'assets/icons/expense/insurance.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Shopping',
+    'assetPath': 'assets/icons/expense/shopping.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Social',
+    'assetPath': 'assets/icons/expense/social.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Sports',
+    'assetPath': 'assets/icons/expense/sports.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Subscriptions',
+    'assetPath': 'assets/icons/expense/subscriptions.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Tax',
+    'assetPath': 'assets/icons/expense/tax.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Telephone',
+    'assetPath': 'assets/icons/expense/telephone.png',
+    'type': 'expense'
+  },
+  {
+    'name': 'Transportation',
+    'assetPath': 'assets/icons/expense/transportation.png',
+    'type': 'expense'
+  },
+];
 
-    const  List<Map<String, String>> incomeCategories = [
-      {
-        'name': 'Awards',
-        'assetPath': 'assets/icons/income/awards.png',
-        'type': 'income'
-      },
-      {
-        'name': 'Coupons',
-        'assetPath': 'assets/icons/income/coupons.png',
-        'type': 'income'
-      },
-      {
-        'name': 'Grants',
-        'assetPath': 'assets/icons/income/grants.png',
-        'type': 'income'
-      },
-      {
-        'name': 'Lottery',
-        'assetPath': 'assets/icons/income/lottery.png',
-        'type': 'income'
-      },
-      {
-        'name': 'Receiving',
-        'assetPath': 'assets/icons/income/receiving.png',
-        'type': 'income'
-      },
-      {
-        'name': 'Refunds',
-        'assetPath': 'assets/icons/income/refunds.png',
-        'type': 'income'
-      },
-      {
-        'name': 'Rental',
-        'assetPath': 'assets/icons/income/rental.png',
-        'type': 'income'
-      },
-      {
-        'name': 'Salary',
-        'assetPath': 'assets/icons/income/salary.png',
-        'type': 'income'
-      },
-      {
-        'name': 'Sale',
-        'assetPath': 'assets/icons/income/sale.png',
-        'type': 'income'
-      },
-    ];
+const List<Map<String, String>> incomeCategories = [
+  {
+    'name': 'Awards',
+    'assetPath': 'assets/icons/income/awards.png',
+    'type': 'income'
+  },
+  {
+    'name': 'Coupons',
+    'assetPath': 'assets/icons/income/coupons.png',
+    'type': 'income'
+  },
+  {
+    'name': 'Grants',
+    'assetPath': 'assets/icons/income/grants.png',
+    'type': 'income'
+  },
+  {
+    'name': 'Lottery',
+    'assetPath': 'assets/icons/income/lottery.png',
+    'type': 'income'
+  },
+  {
+    'name': 'Receiving',
+    'assetPath': 'assets/icons/income/receiving.png',
+    'type': 'income'
+  },
+  {
+    'name': 'Refunds',
+    'assetPath': 'assets/icons/income/refunds.png',
+    'type': 'income'
+  },
+  {
+    'name': 'Rental',
+    'assetPath': 'assets/icons/income/rental.png',
+    'type': 'income'
+  },
+  {
+    'name': 'Salary',
+    'assetPath': 'assets/icons/income/salary.png',
+    'type': 'income'
+  },
+  {
+    'name': 'Sale',
+    'assetPath': 'assets/icons/income/sale.png',
+    'type': 'income'
+  },
+];

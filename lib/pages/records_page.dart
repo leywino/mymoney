@@ -11,7 +11,9 @@ import 'package:mymoney/models/category_model.dart';
 import 'package:mymoney/models/transaction_model.dart';
 
 class RecordsPage extends StatelessWidget {
-  const RecordsPage({super.key});
+  const RecordsPage({super.key, required this.scrollController});
+
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,19 @@ class RecordsPage extends StatelessWidget {
           } else if (state is RecordsLoaded) {
             final groupedTransactions = state.groupedTransactions;
 
+            if (groupedTransactions.isEmpty) {
+              return const Center(
+                child: Text(
+                  "No records found",
+                  style: TextStyle(
+                    color: AppColors.lightYellow,
+                  ),
+                ),
+              );
+            }
+
             return ListView.builder(
+              controller: scrollController,
               shrinkWrap: true,
               itemCount: groupedTransactions.length,
               itemBuilder: (context, index) {
@@ -197,7 +211,7 @@ class RecordsPage extends StatelessWidget {
                           return Row(
                             children: [
                               Image.asset(
-                                accountIconAssetPathList[account.iconNumber!],
+                                accountsAssetIconList[account.iconNumber!],
                                 height: 16,
                               ),
                               const SizedBox(width: 4),

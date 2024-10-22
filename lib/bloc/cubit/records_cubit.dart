@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mymoney/core/database_helper.dart';
@@ -11,19 +10,13 @@ enum DateRangeType { daily, weekly, monthly, quarterly, halfYearly, yearly }
 
 class RecordsCubit extends Cubit<RecordsState> {
   final DatabaseHelper _databaseHelper;
-  DateRangeType _currentRangeType = DateRangeType.weekly; // Default to weekly
-  DateTime _startDate =
-      _getStartOfWeek(DateTime.now()); // Default to current week
+  DateRangeType _currentRangeType = DateRangeType.daily; // Default to daily
+  DateTime _startDate = DateTime.now(); // Default to today
 
   RecordsCubit(this._databaseHelper) : super(RecordsLoading());
 
   DateRangeType get currentRangeType => _currentRangeType;
   DateTime get startDate => _startDate;
-
-  // Helper function to get the start of the current week (Sunday)
-  static DateTime _getStartOfWeek(DateTime date) {
-    return date.subtract(Duration(days: date.weekday));
-  }
 
   // Helper function to get the formatted date range label
   String getCurrentDateRangeLabel() {
@@ -56,9 +49,7 @@ class RecordsCubit extends Cubit<RecordsState> {
 
   void changeDateRangeType(DateRangeType rangeType) {
     _currentRangeType = rangeType;
-
     _startDate = _getStartOfRange(DateTime.now(), _currentRangeType);
-
     fetchRecords();
   }
 
@@ -122,6 +113,14 @@ class RecordsCubit extends Cubit<RecordsState> {
 
     return transactions.where((transaction) {
       DateTime transactionDate = DateTime.parse(transaction.date);
+
+      // For daily range, only include transactions on the same day
+      if (_currentRangeType == DateRangeType.daily) {
+        return transactionDate.year == _startDate.year &&
+            transactionDate.month == _startDate.month &&
+            transactionDate.day == _startDate.day;
+      }
+
       return (transactionDate.isAtSameMomentAs(_startDate) ||
               transactionDate.isAfter(_startDate)) &&
           (transactionDate.isAtSameMomentAs(endDate) ||
@@ -192,5 +191,10 @@ class RecordsCubit extends Cubit<RecordsState> {
       default:
         return startDate;
     }
+  }
+
+  // Helper to get the start of the current week (Sunday)
+  static DateTime _getStartOfWeek(DateTime date) {
+    return date.subtract(Duration(days: date.weekday));
   }
 }

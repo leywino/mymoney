@@ -10,4 +10,5 @@ class AppColors {
   static const Color secondaryText = Color(0xFFA49F84);
   static const Color grayBrown = Color(0xFF5C5B55);
   static const Color lightBeige = Color(0xFFBFB999);
+  static const Color customOliveGray = Color(0xFF4D4A3D);
 }
