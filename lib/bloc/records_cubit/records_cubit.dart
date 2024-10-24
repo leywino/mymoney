@@ -9,15 +9,14 @@ enum DateRangeType { daily, weekly, monthly, quarterly, halfYearly, yearly }
 
 class RecordsCubit extends Cubit<RecordsState> {
   final DatabaseHelper _databaseHelper;
-  DateRangeType _currentRangeType = DateRangeType.daily; // Default to daily
-  DateTime _startDate = DateTime.now(); // Default to today
+  DateRangeType _currentRangeType = DateRangeType.daily;
+  DateTime _startDate = DateTime.now();
 
   RecordsCubit(this._databaseHelper) : super(RecordsLoading());
 
   DateRangeType get currentRangeType => _currentRangeType;
   DateTime get startDate => _startDate;
 
-  // Helper function to get the formatted date range label
   String getCurrentDateRangeLabel() {
     final DateTime endDate = _getEndDateForRange(_startDate, _currentRangeType);
     switch (_currentRangeType) {
@@ -90,8 +89,9 @@ class RecordsCubit extends Cubit<RecordsState> {
       for (Transaction transaction in filteredTransactions) {
         String transactionDay =
             DateFormat('dd MMM yyyy').format(DateTime.parse(transaction.date));
+
         if (groupedTransactions.containsKey(transactionDay)) {
-          groupedTransactions[transactionDay]!.add(transaction);
+          groupedTransactions[transactionDay]!.insert(0, transaction);
         } else {
           groupedTransactions[transactionDay] = [transaction];
         }
@@ -106,21 +106,26 @@ class RecordsCubit extends Cubit<RecordsState> {
         }
       }
 
-      // Sort categoryTotals by value in descending order (from most spent to least spent)
-      final sortedCategoryTotals = Map<int, double>.fromEntries(
-        categoryTotals.entries.toList()
-          ..sort((a, b) => b.value.compareTo(a.value)), // Sorting by value
+      final sortedGroupedTransactions =
+          Map<String, List<Transaction>>.fromEntries(
+        groupedTransactions.entries.toList()
+          ..sort((a, b) => DateFormat('dd MMM yyyy')
+              .parse(b.key)
+              .compareTo(DateFormat('dd MMM yyyy').parse(a.key))),
       );
 
-      // Emit records and sorted analytics data
+      final sortedCategoryTotals = Map<int, double>.fromEntries(
+        categoryTotals.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value)),
+      );
+
       emit(RecordsAnalyticsLoaded(
-          groupedTransactions, sortedCategoryTotals, totalAmountSpent));
+          sortedGroupedTransactions, sortedCategoryTotals, totalAmountSpent));
     } catch (e) {
       emit(RecordsError("Failed to load records: $e"));
     }
   }
 
-  // Helper method to filter transactions by the selected date range
   List<Transaction> _filterTransactionsByDateRange(
       List<Transaction> transactions) {
     final DateTime endDate = _getEndDateForRange(_startDate, _currentRangeType);
@@ -128,7 +133,6 @@ class RecordsCubit extends Cubit<RecordsState> {
     return transactions.where((transaction) {
       DateTime transactionDate = DateTime.parse(transaction.date);
 
-      // For daily range, only include transactions on the same day
       if (_currentRangeType == DateRangeType.daily) {
         return transactionDate.year == _startDate.year &&
             transactionDate.month == _startDate.month &&
@@ -142,7 +146,6 @@ class RecordsCubit extends Cubit<RecordsState> {
     }).toList();
   }
 
-  // Helper method to get the end date for a given date range
   DateTime _getEndDateForRange(DateTime startDate, DateRangeType rangeType) {
     switch (rangeType) {
       case DateRangeType.daily:
@@ -150,22 +153,18 @@ class RecordsCubit extends Cubit<RecordsState> {
       case DateRangeType.weekly:
         return startDate.add(const Duration(days: 6));
       case DateRangeType.monthly:
-        return DateTime(
-            startDate.year, startDate.month + 1, 0); // Last day of the month
+        return DateTime(startDate.year, startDate.month + 1, 0);
       case DateRangeType.quarterly:
-        return DateTime(
-            startDate.year, startDate.month + 3, 0); // Last day of the quarter
+        return DateTime(startDate.year, startDate.month + 3, 0);
       case DateRangeType.halfYearly:
-        return DateTime(startDate.year, startDate.month + 6,
-            0); // Last day of the half-year
+        return DateTime(startDate.year, startDate.month + 6, 0);
       case DateRangeType.yearly:
-        return DateTime(startDate.year, 12, 31); // Last day of the year
+        return DateTime(startDate.year, 12, 31);
       default:
         return startDate;
     }
   }
 
-  // Get the start date for the next range
   DateTime _getStartDateForNextRange(
       DateTime startDate, DateRangeType rangeType) {
     switch (rangeType) {
@@ -186,7 +185,6 @@ class RecordsCubit extends Cubit<RecordsState> {
     }
   }
 
-  // Get the start date for the previous range
   DateTime _getStartDateForPreviousRange(
       DateTime startDate, DateRangeType rangeType) {
     switch (rangeType) {
@@ -207,7 +205,6 @@ class RecordsCubit extends Cubit<RecordsState> {
     }
   }
 
-  // Helper to get the start of the current week (Sunday)
   static DateTime _getStartOfWeek(DateTime date) {
     return date.subtract(Duration(days: date.weekday));
   }

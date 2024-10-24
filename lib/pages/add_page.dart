@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mymoney/bloc/accounts_cubit/accounts_cubit.dart';
+import 'package:mymoney/bloc/records_cubit/records_cubit.dart';
 import 'package:mymoney/components/add_account_alert_dialogue.dart';
 import 'package:mymoney/components/balance_text_widget.dart';
 import 'package:mymoney/components/calculator_widget.dart';
@@ -38,8 +41,7 @@ class _AddPageState extends State<AddPage> {
     final result = await showModalBottomSheet(
       backgroundColor: AppColors.grayBrown,
       context: context,
-      isScrollControlled:
-          true, // This helps in adjusting the modal size when keyboard is open
+      isScrollControlled: true,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
@@ -87,7 +89,6 @@ class _AddPageState extends State<AddPage> {
                         if (!context.mounted) return;
 
                         if (isAdded) {
-                          // Refresh the list of accounts after a new account is added
                           List<Account> updatedAccounts =
                               await dbHelper.getAllAccounts();
 
@@ -250,7 +251,7 @@ class _AddPageState extends State<AddPage> {
               'SAVE',
             ),
             onPressed: () {
-              _saveTransaction();
+              isSelected[2] ? _saveTransfer() : _saveTransaction();
             },
             icon: const Icon(Icons.check),
           ),
@@ -272,53 +273,84 @@ class _AddPageState extends State<AddPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Center(
-              child: ToggleButtons(
-                borderColor: AppColors.darkGray,
-                fillColor: AppColors.lightYellow,
-                selectedColor: AppColors.darkGray,
-                color: Colors.grey[400],
-                borderRadius: BorderRadius.circular(5),
-                isSelected: isSelected,
-                onPressed: (int index) {
-                  setState(() {
-                    for (int buttonIndex = 0;
-                        buttonIndex < isSelected.length;
-                        buttonIndex++) {
-                      if (buttonIndex == index) {
-                        isSelected[buttonIndex] = true;
-                      } else {
-                        isSelected[buttonIndex] = false;
-                      }
-                    }
-                  });
-                },
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      children: [
-                        if (isSelected[0]) checkIcon(),
-                        Text(_buildTrasactionType()),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      children: [
-                        if (isSelected[1]) checkIcon(),
-                        Text(_buildTrasactionType()),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      children: [
-                        if (isSelected[2]) checkIcon(),
-                        Text(_buildTrasactionType()),
-                      ],
-                    ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ToggleButtons(
+                    borderWidth: 0,
+                    borderColor: Colors.transparent,
+                    fillColor: Colors.transparent,
+                    selectedColor: AppColors.lightYellow,
+                    color: Colors.grey[400],
+                    isSelected: isSelected,
+                    onPressed: (int index) {
+                      setState(() {
+                        for (int buttonIndex = 0;
+                            buttonIndex < isSelected.length;
+                            buttonIndex++) {
+                          isSelected[buttonIndex] = buttonIndex == index;
+                        }
+                      });
+                    },
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          children: [
+                            if (isSelected[0]) checkIcon(),
+                            Text(
+                              'INCOME',
+                              style: TextStyle(
+                                fontWeight: isSelected[0]
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isSelected[0]
+                                    ? AppColors.lightYellow
+                                    : Colors.grey[400],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          children: [
+                            if (isSelected[1]) checkIcon(),
+                            Text(
+                              'EXPENSE',
+                              style: TextStyle(
+                                fontWeight: isSelected[1]
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isSelected[1]
+                                    ? AppColors.lightYellow
+                                    : Colors.grey[400],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          children: [
+                            if (isSelected[2]) checkIcon(),
+                            Text(
+                              'TRANSFER',
+                              style: TextStyle(
+                                fontWeight: isSelected[2]
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isSelected[2]
+                                    ? AppColors.lightYellow
+                                    : Colors.grey[400],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -350,11 +382,23 @@ class _AddPageState extends State<AddPage> {
                   buildCustomButton(
                     context,
                     title: _buildTitle(1),
-                    icon: const Icon(
-                      Icons.credit_card,
-                      color: AppColors.lightYellow,
-                    ),
-                    label: 'Account',
+                    icon: secondAccount == null
+                        ? const Icon(
+                            Icons.credit_card,
+                            color: AppColors.lightYellow,
+                          )
+                        : Image.asset(
+                            accountsAssetIconList[secondAccount!.iconNumber!]),
+                    label:
+                        secondAccount == null ? 'Account' : secondAccount!.name,
+                    onTap: () async {
+                      Account? account = await _showAccountSelection();
+                      if (account != null) {
+                        setState(() {
+                          secondAccount = account;
+                        });
+                      }
+                    },
                   )
                 else
                   buildCustomButton(
@@ -417,7 +461,7 @@ class _AddPageState extends State<AddPage> {
   Row checkIcon() {
     return const Row(
       children: [
-        Icon(Icons.check_circle, color: AppColors.darkGray, size: 16),
+        Icon(Icons.check_circle, color: AppColors.lightYellow, size: 16),
         SizedBox(width: 4),
       ],
     );
@@ -496,7 +540,49 @@ class _AddPageState extends State<AddPage> {
     );
   }
 
-  // void _saveTransfer() {}
+  void _saveTransfer() {
+    if (firstAccount == null) {
+      Fluttertoast.showToast(
+        msg: 'please select an account',
+        backgroundColor: AppColors.beige,
+        textColor: AppColors.lightYellow,
+      );
+      return;
+    }
+
+    if (secondAccount == null) {
+      Fluttertoast.showToast(
+        msg: 'please select an account',
+        backgroundColor: AppColors.beige,
+        textColor: AppColors.lightYellow,
+      );
+      return;
+    }
+
+    if (amount == null || amount == 0) {
+      if (_calculatorGlobalKey.currentState != null) {
+        _calculatorGlobalKey.currentState!.changeDisplayColor();
+      }
+      Fluttertoast.showToast(
+        msg: 'please enter amount',
+        backgroundColor: AppColors.beige,
+        textColor: AppColors.lightYellow,
+      );
+      return;
+    }
+
+    final dbHelper = DatabaseHelper();
+    Transaction transaction = Transaction(
+        accountId: firstAccount!.id!,
+        toAccountId: secondAccount!.id!,
+        categoryId: 0,
+        amount: amount!,
+        date: selectedDateAndTime!,
+        type: "transfer");
+    dbHelper.transferMoney(transaction);
+    context.read<RecordsCubit>().fetchRecords();
+    Navigator.pop(context);
+  }
 
   void _saveTransaction() {
     if (firstAccount == null) {
@@ -538,6 +624,8 @@ class _AddPageState extends State<AddPage> {
         type: _buildTrasactionType());
     dbHelper.insertTransaction(transaction);
     dbHelper.updateAccountBalance(firstAccount!.id!, amount!);
+    context.read<AccountsCubit>().fetchAccounts();
+    context.read<RecordsCubit>().fetchRecords();
     Navigator.pop(context);
   }
 

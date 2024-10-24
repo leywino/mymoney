@@ -52,6 +52,7 @@ class DatabaseHelper {
     CREATE TABLE transactions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       accountId INTEGER,
+      toAccountId INTEGER,
       categoryId INTEGER,
       amount REAL,
       date TEXT,
@@ -80,8 +81,17 @@ class DatabaseHelper {
     )
     ''');
 
+    await _insertTransactionCategory(db);
     await _insertExpenseCategories(db);
     await _insertIncomeCategories(db);
+  }
+
+  Future<void> _insertTransactionCategory(Database db) async {
+    await db.insert('categories', {
+      'name': 'Transfer',
+      'assetPath': 'assets/icons/transfer.png',
+      'type': 'transfer'
+    });
   }
 
   Future<void> _insertExpenseCategories(Database db) async {
@@ -94,6 +104,74 @@ class DatabaseHelper {
     for (var category in incomeCategories) {
       await db.insert('categories', category);
     }
+  }
+
+  Future<void> transferMoney(Transaction transaction) async {
+    int fromAccountId = transaction.accountId;
+    int toAccountId = transaction.toAccountId!;
+    double amountToTransfer = transaction.amount;
+    final db = await database;
+
+    await db.transaction((txn) async {
+      final List<Map<String, dynamic>> fromAccountResult = await txn.query(
+        'accounts',
+        columns: ['balance'],
+        where: 'id = ?',
+        whereArgs: [fromAccountId],
+        limit: 1,
+      );
+
+      final List<Map<String, dynamic>> toAccountResult = await txn.query(
+        'accounts',
+        columns: ['balance'],
+        where: 'id = ?',
+        whereArgs: [toAccountId],
+        limit: 1,
+      );
+
+      if (fromAccountResult.isEmpty) {
+        throw Exception('From Account with ID $fromAccountId not found');
+      }
+
+      if (toAccountResult.isEmpty) {
+        throw Exception('To Account with ID $toAccountId not found');
+      }
+
+      final double fromAccountBalance =
+          fromAccountResult.first['balance'] as double;
+      if (fromAccountBalance < amountToTransfer) {
+        throw Exception('Insufficient balance in the From Account');
+      }
+
+      final double updatedFromAccountBalance =
+          fromAccountBalance - amountToTransfer;
+      await txn.update(
+        'accounts',
+        {'balance': updatedFromAccountBalance},
+        where: 'id = ?',
+        whereArgs: [fromAccountId],
+      );
+
+      final double toAccountBalance =
+          toAccountResult.first['balance'] as double;
+      final double updatedToAccountBalance =
+          toAccountBalance + amountToTransfer;
+      await txn.update(
+        'accounts',
+        {'balance': updatedToAccountBalance},
+        where: 'id = ?',
+        whereArgs: [toAccountId],
+      );
+
+      await txn.insert('transactions', {
+        'accountId': fromAccountId,
+        'toAccountId': toAccountId,
+        'categoryId': 0,
+        'amount': amountToTransfer,
+        'date': DateTime.now().toIso8601String(),
+        'type': 'TRANSFER',
+      });
+    });
   }
 
   Future<List<Map<String, dynamic>>> getCategoriesByType(String type) async {

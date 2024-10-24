@@ -6,6 +6,7 @@ import 'package:mymoney/components/balance_text_widget.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
 import 'package:mymoney/core/database_helper.dart';
+import 'package:mymoney/core/strings.dart';
 import 'package:mymoney/models/account_model.dart';
 import 'package:mymoney/models/category_model.dart';
 import 'package:mymoney/models/transaction_model.dart';
@@ -82,8 +83,14 @@ class RecordsPage extends StatelessWidget {
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
                           final transaction = transactions[index];
-                          return _buildTransactionItem(
-                              transaction, transactions.length, index, context);
+                          if (transaction.type.toLowerCase() == "expense" ||
+                              transaction.type.toLowerCase() == "income") {
+                            return _buildTransactionItem(transaction,
+                                transactions.length, index, context);
+                          } else {
+                            return _buildTransferItem(transaction,
+                                transactions.length, index, context);
+                          }
                         },
                       ),
                     )
@@ -253,6 +260,151 @@ class RecordsPage extends StatelessWidget {
             color: AppColors.lightBeige,
             thickness: 0.5,
           )
+      ],
+    );
+  }
+
+  Widget _buildTransferItem(Transaction transaction, int totalLength, int index,
+      BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final databaseHelper = DatabaseHelper();
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                // Display the transfer icon for "TRANSFER" type
+                const CircleAvatar(
+                  radius: 24,
+                  backgroundImage: AssetImage(
+                    'assets/icons/transfer.png',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Transfer',
+                      style: TextStyle(
+                        color: AppColors.lightYellow,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        // Show From Account
+                        FutureBuilder<Account?>(
+                          future: databaseHelper
+                              .getAccountWithId(transaction.accountId),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox.shrink();
+                            } else if (snapshot.hasError) {
+                              return const Text(
+                                'Error',
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
+                              );
+                            } else if (snapshot.hasData &&
+                                snapshot.data != null) {
+                              final fromAccount = snapshot.data!;
+                              return Row(
+                                children: [
+                                  Image.asset(
+                                    accountsAssetIconList[
+                                        fromAccount.iconNumber!],
+                                    height: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    fromAccount.name,
+                                    style: const TextStyle(
+                                      color: AppColors.lightYellow,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            } else {
+                              return const Text(
+                                'Unknown Account',
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 12),
+                              );
+                            }
+                          },
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.arrow_forward,
+                            size: 16, color: AppColors.lightYellow),
+                        const SizedBox(width: 4),
+
+                        // Show To Account
+                        FutureBuilder<Account?>(
+                          future: databaseHelper
+                              .getAccountWithId(transaction.toAccountId!),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox.shrink();
+                            } else if (snapshot.hasError) {
+                              return const Text(
+                                'Error',
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
+                              );
+                            } else if (snapshot.hasData &&
+                                snapshot.data != null) {
+                              final toAccount = snapshot.data!;
+                              return Row(
+                                children: [
+                                  Image.asset(
+                                    accountsAssetIconList[
+                                        toAccount.iconNumber!],
+                                    height: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    toAccount.name,
+                                    style: const TextStyle(
+                                      color: AppColors.lightYellow,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            } else {
+                              return const Text(
+                                'Unknown Account',
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 12),
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            // Transaction amount (styled for negative/positive values)
+            Text(
+              "$currentCurrency${transaction.amount}",
+              style: const TextStyle(color: Colors.blue, fontSize: 16),
+            )
+          ],
+        ),
+        if (index != totalLength - 1 && totalLength != 1)
+          Divider(
+            indent: size.width * 0.15,
+            color: AppColors.lightBeige,
+            thickness: 0.5,
+          ),
       ],
     );
   }

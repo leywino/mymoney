@@ -1,6 +1,7 @@
 class Transaction {
   final int? id;
   final int accountId;
+  final int? toAccountId;
   final int categoryId;
   final double amount;
   final String date;
@@ -15,6 +16,7 @@ class Transaction {
     required this.date,
     required this.type,
     this.notes,
+    this.toAccountId,
   });
 
   Map<String, dynamic> toMap() {
@@ -26,6 +28,7 @@ class Transaction {
       'date': date,
       'notes': notes,
       'type': type,
+      'toAccountId': toAccountId,
     };
   }
 
@@ -38,6 +41,7 @@ class Transaction {
       date: map['date'],
       notes: map['notes'],
       type: map['type'],
+      toAccountId: map['toAccountId'],
     );
   }
 }
