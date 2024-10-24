@@ -43,7 +43,8 @@ class BalanceTextWidget extends StatelessWidget {
     if (isSymbol) {
       final String sign = balance < 0 ? "-" : "+";
       formatted = "$sign$formatted";
-    } if(isMinusOnly){
+    }
+    if (isMinusOnly) {
       final String sign = balance < 0 ? "-" : "";
       formatted = "$sign$formatted";
     }
@@ -52,6 +53,6 @@ class BalanceTextWidget extends StatelessWidget {
   }
 
   Color _getBalanceColor(double balance) {
-    return balance < 0 ? Colors.red : Colors.green;
+    return balance < 0 ? const Color.fromARGB(255, 255, 89, 0) : Colors.green;
   }
 }

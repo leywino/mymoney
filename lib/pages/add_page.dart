@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mymoney/components/add_account_alert_dialogue.dart';
 import 'package:mymoney/components/balance_text_widget.dart';
 import 'package:mymoney/components/calculator_widget.dart';
 import 'package:mymoney/components/date_time_picker.dart';
@@ -31,57 +32,86 @@ class _AddPageState extends State<AddPage> {
   Future<Account?> _showAccountSelection() async {
     final dbHelper = DatabaseHelper();
     List<Account> accounts = await dbHelper.getAllAccounts();
+
     if (!mounted) return null;
+
     final result = await showModalBottomSheet(
       backgroundColor: AppColors.grayBrown,
       context: context,
+      isScrollControlled:
+          true, // This helps in adjusting the modal size when keyboard is open
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Select Account',
-                style: TextStyle(color: AppColors.lightYellow, fontSize: 20),
-              ),
-              const SizedBox(height: 8.0),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: accounts.length,
-                itemBuilder: (context, index) {
-                  Account account = accounts[index];
-                  return ListTile(
-                    leading: Image.asset(
-                        height: 30,
-                        accountsAssetIconList[account.iconNumber!]),
-                    title: Text(
-                      account.name,
-                      style: const TextStyle(
-                        color: AppColors.lightYellow,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Container(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Select Account',
+                      style:
+                          TextStyle(color: AppColors.lightYellow, fontSize: 20),
+                    ),
+                    const SizedBox(height: 8.0),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: accounts.length,
+                      itemBuilder: (context, index) {
+                        Account account = accounts[index];
+                        return ListTile(
+                          leading: Image.asset(
+                            accountsAssetIconList[account.iconNumber!],
+                            height: 30,
+                          ),
+                          title: Text(
+                            account.name,
+                            style: const TextStyle(
+                              color: AppColors.lightYellow,
+                            ),
+                          ),
+                          trailing: BalanceTextWidget(
+                            balance: account.balance,
+                            fontSize: 16,
+                          ),
+                          onTap: () {
+                            Navigator.pop(context, [account]);
+                          },
+                        );
+                      },
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        final isAdded = await showAddAccountDialog(context);
+                        if (!context.mounted) return;
+
+                        if (isAdded) {
+                          // Refresh the list of accounts after a new account is added
+                          List<Account> updatedAccounts =
+                              await dbHelper.getAllAccounts();
+
+                          setState(() {
+                            accounts = updatedAccounts;
+                          });
+                        }
+                      },
+                      child: const Text(
+                        'Add New Account',
+                        style: TextStyle(
+                          color: AppColors.lightYellow,
+                        ),
                       ),
                     ),
-                    trailing: BalanceTextWidget(
-                      balance: account.balance,
-                      fontSize: 16,
-                    ),
-                    onTap: () {
-                      Navigator.pop(context, [account]);
-                    },
-                  );
-                },
+                  ],
+                ),
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Add New Account'),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
+
     if (result != null && result.isNotEmpty) {
       return result.first;
     } else {

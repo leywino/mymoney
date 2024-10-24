@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mymoney/bloc/cubit/records_cubit.dart';
+import 'package:mymoney/bloc/accounts_cubit/accounts_cubit.dart';
+import 'package:mymoney/bloc/records_cubit/records_cubit.dart';
 import 'package:mymoney/core/database_helper.dart';
 import 'package:mymoney/pages/home_page.dart';
 
@@ -14,6 +15,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final databaseHelper = DatabaseHelper();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -21,7 +23,10 @@ class MainApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => RecordsCubit(DatabaseHelper())..fetchRecords(),
+          create: (context) => RecordsCubit(databaseHelper)..fetchRecords(),
+        ),
+        BlocProvider(
+          create: (context) => AccountsCubit(databaseHelper),
         ),
       ],
       child: MaterialApp(

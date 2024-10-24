@@ -110,6 +110,15 @@ class DatabaseHelper {
     return await db.insert('accounts', account.toMap());
   }
 
+  Future<int> deleteAccount(int accountId) async {
+    final db = await database;
+    return await db.delete(
+      'accounts',
+      where: 'id = ?',
+      whereArgs: [accountId],
+    );
+  }
+
   Future<Category?> getCategoryWithId(int categoryId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(

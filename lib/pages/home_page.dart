@@ -4,6 +4,7 @@ import 'package:mymoney/components/date_range_picker.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/pages/accounts_page.dart';
 import 'package:mymoney/pages/add_page.dart';
+import 'package:mymoney/pages/analysis_page.dart';
 import 'package:mymoney/pages/records_page.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -46,7 +47,7 @@ class _HomePageState extends State<HomePage> {
 
     _pages = <Widget>[
       RecordsPage(scrollController: _scrollController),
-      const Text('Analysis Page'),
+      const AnalysisPage(),
       const Text('Budgets Page'),
       AccountsPage(scrollController: _scrollController),
       const Text('Categories Page'),
@@ -74,8 +75,9 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: AppColors.darkGray,
         title: _buildAppBar(),
       ),
-      body: Center(
-        child: _pages.elementAt(_selectedIndex),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
       ),
       floatingActionButton: AnimatedOpacity(
         duration: const Duration(milliseconds: 300),

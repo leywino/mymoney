@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mymoney/core/database_helper.dart';
@@ -37,7 +36,6 @@ class RecordsCubit extends Cubit<RecordsState> {
     }
   }
 
-  // Method to move to the next or previous date range (week, month, etc.)
   void moveDateRange(bool isNext) {
     if (isNext) {
       _startDate = _getStartDateForNextRange(_startDate, _currentRangeType);
@@ -79,28 +77,44 @@ class RecordsCubit extends Cubit<RecordsState> {
     try {
       emit(RecordsLoading());
 
-      // Fetch all transactions from the database
       List<Transaction> transactions =
           await _databaseHelper.getAllTransactions();
 
       final filteredTransactions = _filterTransactionsByDateRange(transactions);
 
       final Map<String, List<Transaction>> groupedTransactions = {};
+      final Map<int, double> categoryTotals = {};
 
-      // Group transactions by date
+      double totalAmountSpent = 0;
+
       for (Transaction transaction in filteredTransactions) {
-        log('loading ${transaction.toString()}');
         String transactionDay =
             DateFormat('dd MMM yyyy').format(DateTime.parse(transaction.date));
-
         if (groupedTransactions.containsKey(transactionDay)) {
           groupedTransactions[transactionDay]!.add(transaction);
         } else {
           groupedTransactions[transactionDay] = [transaction];
         }
+
+        final categoryId = transaction.categoryId;
+        final amount = transaction.amount;
+
+        if (amount < 0) {
+          totalAmountSpent += amount.abs();
+          categoryTotals[categoryId] =
+              (categoryTotals[categoryId] ?? 0) + amount.abs();
+        }
       }
 
-      emit(RecordsLoaded(groupedTransactions));
+      // Sort categoryTotals by value in descending order (from most spent to least spent)
+      final sortedCategoryTotals = Map<int, double>.fromEntries(
+        categoryTotals.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value)), // Sorting by value
+      );
+
+      // Emit records and sorted analytics data
+      emit(RecordsAnalyticsLoaded(
+          groupedTransactions, sortedCategoryTotals, totalAmountSpent));
     } catch (e) {
       emit(RecordsError("Failed to load records: $e"));
     }

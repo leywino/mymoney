@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mymoney/bloc/cubit/records_cubit.dart';
+import 'package:mymoney/bloc/records_cubit/records_cubit.dart';
 import 'package:mymoney/core/color.dart';
 
 class DateRangePicker extends StatelessWidget {

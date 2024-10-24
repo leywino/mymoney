@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mymoney/bloc/accounts_cubit/accounts_cubit.dart';
+import 'package:mymoney/components/add_account_alert_dialogue.dart';
 import 'package:mymoney/components/balance_text_widget.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
-import 'package:mymoney/core/database_helper.dart';
 import 'package:mymoney/models/account_model.dart';
 
-class AccountsPage extends StatelessWidget {
+class AccountsPage extends StatefulWidget {
   const AccountsPage({super.key, required this.scrollController});
 
   final ScrollController scrollController;
+
+  @override
+  State<AccountsPage> createState() => _AccountsPageState();
+}
+
+class _AccountsPageState extends State<AccountsPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<AccountsCubit>().fetchAccounts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,44 +29,46 @@ class AccountsPage extends StatelessWidget {
       backgroundColor: AppColors.darkGray,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            FutureBuilder<List<Account>>(
-              future: DatabaseHelper().getAllAccounts(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No accounts found.'));
-                }
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BlocBuilder<AccountsCubit, AccountsState>(
+                builder: (context, state) {
+                  if (state is AccountsLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is AccountsError) {
+                    return Center(child: Text('Error: ${state.errorMessage}'));
+                  } else if (state is AccountsLoaded) {
+                    if (state.accounts.isEmpty) {
+                      return const Center(child: Text('No accounts found.'));
+                    }
 
-                // Display the list of accounts
-                final accounts = snapshot.data!;
-                return ListView.builder(
-                  shrinkWrap: true,
-                  controller: scrollController,
-                  itemCount: accounts.length,
-                  itemBuilder: (context, index) {
-                    final account = accounts[index];
-                    return _buildAccountCard(context, account);
-                  },
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildAddNewAccountButton(context),
-          ],
+                    final accounts = state.accounts;
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      controller: widget.scrollController,
+                      itemCount: accounts.length,
+                      itemBuilder: (context, index) {
+                        final account = accounts[index];
+                        return _buildAccountCard(context, account);
+                      },
+                    );
+                  }
+                  return const SizedBox
+                      .shrink(); // Placeholder for other states
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildAddNewAccountButton(context),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildAccountCard(BuildContext context, Account account) {
-    bool isNegative = account.balance < 0;
-
     return Card(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -80,7 +95,11 @@ class AccountsPage extends StatelessWidget {
         ),
         trailing: IconButton(
           icon: const Icon(Icons.more_vert, color: AppColors.lightYellow),
-          onPressed: () {},
+          onPressed: () {
+            context
+                .read<AccountsCubit>()
+                .deleteAccount(account.id!); // Delete account
+          },
         ),
       ),
     );
@@ -88,7 +107,13 @@ class AccountsPage extends StatelessWidget {
 
   Widget _buildAddNewAccountButton(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () async {
+        final isAdded = await showAddAccountDialog(context);
+        if (isAdded) {
+          if (!context.mounted) return;
+          context.read<AccountsCubit>().fetchAccounts();
+        }
+      },
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16.0),

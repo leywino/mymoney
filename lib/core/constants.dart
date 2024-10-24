@@ -116,6 +116,11 @@ const List<Map<String, String>> expenseCategories = [
     'type': 'expense'
   },
   {
+    'name': 'Fuel',
+    'assetPath': 'assets/icons/expense/fuel.png',
+    'type': 'expense'
+  },
+  {
     'name': 'Food',
     'assetPath': 'assets/icons/expense/food.png',
     'type': 'expense'

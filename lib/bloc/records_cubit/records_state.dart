@@ -4,10 +4,12 @@ abstract class RecordsState {}
 
 class RecordsLoading extends RecordsState {}
 
-class RecordsLoaded extends RecordsState {
+class RecordsAnalyticsLoaded extends RecordsState {
   final Map<String, List<Transaction>> groupedTransactions;
+  final Map<int, double> categoryTotals;
+  final double totalSpent;
 
-  RecordsLoaded(this.groupedTransactions);
+  RecordsAnalyticsLoaded(this.groupedTransactions, this.categoryTotals, this.totalSpent);
 }
 
 class RecordsError extends RecordsState {

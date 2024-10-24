@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:mymoney/bloc/cubit/records_cubit.dart';
+import 'package:mymoney/bloc/records_cubit/records_cubit.dart';
 import 'package:mymoney/components/balance_text_widget.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
@@ -23,7 +23,7 @@ class RecordsPage extends StatelessWidget {
         builder: (context, state) {
           if (state is RecordsLoading) {
             return const Center(child: CircularProgressIndicator());
-          } else if (state is RecordsLoaded) {
+          } else if (state is RecordsAnalyticsLoaded) {
             final groupedTransactions = state.groupedTransactions;
 
             if (groupedTransactions.isEmpty) {
