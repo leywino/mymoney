@@ -7,6 +7,7 @@ import 'package:mymoney/pages/accounts_page.dart';
 import 'package:mymoney/pages/add_page.dart';
 import 'package:mymoney/pages/analysis_page.dart';
 import 'package:mymoney/pages/budgets_page.dart';
+import 'package:mymoney/pages/categories_page.dart';
 import 'package:mymoney/pages/records_page.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -32,7 +33,7 @@ class _HomePageState extends State<HomePage> {
       const AnalysisPage(),
       const BudgetsPage(),
       const AccountsPage(),
-      const Text('Categories Page'),
+      const CategoriesPage(),
     ];
   }
 
