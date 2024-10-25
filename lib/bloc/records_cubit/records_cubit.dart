@@ -9,10 +9,13 @@ enum DateRangeType { daily, weekly, monthly, quarterly, halfYearly, yearly }
 
 class RecordsCubit extends Cubit<RecordsState> {
   final DatabaseHelper _databaseHelper;
-  DateRangeType _currentRangeType = DateRangeType.daily;
+  DateRangeType _currentRangeType = DateRangeType.monthly;
   DateTime _startDate = DateTime.now();
 
-  RecordsCubit(this._databaseHelper) : super(RecordsLoading());
+  RecordsCubit(this._databaseHelper) : super(RecordsLoading()) {
+    _startDate = _getStartOfRange(DateTime.now(), _currentRangeType);
+    fetchRecords();
+  }
 
   DateRangeType get currentRangeType => _currentRangeType;
   DateTime get startDate => _startDate;

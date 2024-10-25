@@ -93,16 +93,69 @@ class _AccountsPageState extends State<AccountsPage> {
           balance: account.balance,
           isMinusOnly: true,
         ),
-        trailing: IconButton(
+        trailing: PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert, color: AppColors.lightYellow),
-          onPressed: () {
-            context
-                .read<AccountsCubit>()
-                .deleteAccount(account.id!); // Delete account
+          color: AppColors.darkGray,
+          onSelected: (value) {
+            if (value == 'edit') {
+              _editAccount(context, account);
+            } else if (value == 'delete') {
+              _deleteAccount(context, account);
+            }
           },
+          itemBuilder: (BuildContext context) => [
+            const PopupMenuItem(
+              value: 'edit',
+              child: Text(
+                'Edit',
+                style: TextStyle(color: AppColors.lightYellow),
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'delete',
+              child: Text(
+                'Delete',
+                style: TextStyle(color: AppColors.lightYellow),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  void _editAccount(BuildContext context, Account account) async {
+    // Open dialog to edit the account (reuse the add account dialog, but pass account data for editing)
+    final isEdited = await showAddAccountDialog(context, account: account);
+    if (isEdited) {
+      if (!context.mounted) return;
+      context.read<AccountsCubit>().fetchAccounts();
+    }
+  }
+
+  void _deleteAccount(BuildContext context, Account account) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Account'),
+        content: const Text('Are you sure you want to delete this account?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete == true) {
+      await context.read<AccountsCubit>().deleteAccount(account.id!);
+      context.read<AccountsCubit>().fetchAccounts();
+    }
   }
 
   Widget _buildAddNewAccountButton(BuildContext context) {

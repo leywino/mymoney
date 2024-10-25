@@ -182,7 +182,7 @@ class AnalysisPage extends StatelessWidget {
                         return CircleAvatar(
                           radius: 24,
                           backgroundImage: AssetImage(
-                            category.assetPath,
+                            categoryAssetIconList[category.iconNumber],
                           ),
                         );
                       } else {

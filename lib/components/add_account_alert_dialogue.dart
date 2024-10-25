@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
 import 'package:mymoney/core/database_helper.dart';
 import 'package:mymoney/models/account_model.dart';
 
-Future<bool> showAddAccountDialog(BuildContext context) async {
+Future<bool> showAddAccountDialog(BuildContext context,
+    {Account? account}) async {
   TextEditingController nameController = TextEditingController();
   TextEditingController initialAmountController = TextEditingController();
   int? selectedIconIndex;
+  if (account != null) {
+    nameController.text = account.name;
+    initialAmountController.text = NumberFormat('#.##').format(account.balance);
+    selectedIconIndex = account.iconNumber;
+  }
+
   final databaseHelper = DatabaseHelper();
   final size = MediaQuery.of(context).size;
 

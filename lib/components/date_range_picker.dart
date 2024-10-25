@@ -48,30 +48,49 @@ class DateRangePicker extends StatelessWidget {
                 onSelected: (DateRangeType selectedRange) {
                   cubit.changeDateRangeType(selectedRange);
                 },
+                color: AppColors.darkGray,
                 itemBuilder: (context) => [
                   const PopupMenuItem(
                     value: DateRangeType.daily,
-                    child: Text("Daily"),
+                    child: Text(
+                      "Daily",
+                      style: TextStyle(color: AppColors.lightYellow),
+                    ),
                   ),
                   const PopupMenuItem(
                     value: DateRangeType.weekly,
-                    child: Text("Weekly"),
+                    child: Text(
+                      "Weekly",
+                      style: TextStyle(color: AppColors.lightYellow),
+                    ),
                   ),
                   const PopupMenuItem(
                     value: DateRangeType.monthly,
-                    child: Text("Monthly"),
+                    child: Text(
+                      "Monthly",
+                      style: TextStyle(color: AppColors.lightYellow),
+                    ),
                   ),
                   const PopupMenuItem(
                     value: DateRangeType.quarterly,
-                    child: Text("Quarterly"),
+                    child: Text(
+                      "Quarterly",
+                      style: TextStyle(color: AppColors.lightYellow),
+                    ),
                   ),
                   const PopupMenuItem(
                     value: DateRangeType.halfYearly,
-                    child: Text("Half-Yearly"),
+                    child: Text(
+                      "Half-Yearly",
+                      style: TextStyle(color: AppColors.lightYellow),
+                    ),
                   ),
                   const PopupMenuItem(
                     value: DateRangeType.yearly,
-                    child: Text("Yearly"),
+                    child: Text(
+                      "Yearly",
+                      style: TextStyle(color: AppColors.lightYellow),
+                    ),
                   ),
                 ],
               ),

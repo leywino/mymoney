@@ -44,4 +44,26 @@ class Transaction {
       toAccountId: map['toAccountId'],
     );
   }
+
+  Transaction copyWith({
+    int? id,
+    int? accountId,
+    int? toAccountId,
+    int? categoryId,
+    double? amount,
+    String? date,
+    String? notes,
+    String? type,
+  }) {
+    return Transaction(
+      id: id ?? this.id,
+      accountId: accountId ?? this.accountId,
+      categoryId: categoryId ?? this.categoryId,
+      amount: amount ?? this.amount,
+      date: date ?? this.date,
+      notes: notes ?? this.notes,
+      type: type ?? this.type,
+      toAccountId: toAccountId ?? this.toAccountId,
+    );
+  }
 }

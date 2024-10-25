@@ -3,17 +3,37 @@ import 'package:intl/intl.dart';
 import 'package:mymoney/core/color.dart';
 
 class DateTimePickerWidget extends StatefulWidget {
-  const DateTimePickerWidget({super.key, required this.onDateChanged});
+  const DateTimePickerWidget(
+      {super.key, required this.onDateChanged, this.initialDateTime});
 
   final Function(String) onDateChanged;
+  final String? initialDateTime;
 
   @override
   State<DateTimePickerWidget> createState() => _DateTimePickerWidgetState();
 }
 
 class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
+  late DateTime selectedDate;
+  late TimeOfDay selectedTime;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _handleInitialDate();
+  }
+
+  void _handleInitialDate() {
+    if (widget.initialDateTime != null) {
+      final DateTime initialDate = DateTime.parse(widget.initialDateTime!);
+      selectedDate = initialDate;
+      selectedTime = TimeOfDay.fromDateTime(initialDate);
+    } else {
+      selectedDate = DateTime.now();
+      selectedTime = TimeOfDay.now();
+    }
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -138,7 +158,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
               ),
             ),
           ),
-          // Box.w10,
+          // Time Picker
           Expanded(
             child: InkWell(
               onTap: () => _selectTime(context),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
 
@@ -7,9 +8,11 @@ class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({
     super.key,
     required this.onCalculate,
+    this.initialAmount,
   });
 
   final Function(double) onCalculate;
+  final String? initialAmount;
 
   @override
   State<CalculatorScreen> createState() => CalculatorScreenState();
@@ -111,6 +114,18 @@ class CalculatorScreenState extends State<CalculatorScreen> {
       currentOperation = null;
       previousValue = null;
     }
+  }
+
+  void _handleInitialAmount() {
+    display = widget.initialAmount != null
+        ? NumberFormat('#.##').format(double.parse(widget.initialAmount!).abs())
+        : "0";
+  }
+
+  @override
+  void initState() {
+    _handleInitialAmount();
+    super.initState();
   }
 
   @override

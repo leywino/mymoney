@@ -15,7 +15,9 @@ import 'package:mymoney/models/category_model.dart';
 import 'package:mymoney/models/transaction_model.dart';
 
 class AddPage extends StatefulWidget {
-  const AddPage({super.key});
+  const AddPage({super.key, this.transaction});
+
+  final Transaction? transaction;
 
   @override
   State<AddPage> createState() => _AddPageState();
@@ -161,7 +163,7 @@ class _AddPageState extends State<AddPage> {
                         onTap: () {
                           Category category = Category(
                               name: categoryMap['name'],
-                              assetPath: categoryMap['assetPath'],
+                              iconNumber: categoryMap['iconNumber'],
                               type: categoryMap['type'],
                               id: categoryMap['id']);
                           Navigator.pop(context, [category]);
@@ -170,7 +172,7 @@ class _AddPageState extends State<AddPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Image.asset(
-                              categoryMap['assetPath'],
+                              categoryAssetIconList[categoryMap['iconNumber']],
                               height: 40,
                             ),
                             const SizedBox(height: 8.0),
@@ -204,9 +206,44 @@ class _AddPageState extends State<AddPage> {
     }
   }
 
+  Future<void> _autoFillIfEdit() async {
+    if (widget.transaction == null) return;
+    final dbHelper = DatabaseHelper();
+    if (widget.transaction!.type.toLowerCase() == "transfer") {
+      final account =
+          await dbHelper.getAccountWithId(widget.transaction!.accountId);
+      final secondAccount =
+          await dbHelper.getAccountWithId(widget.transaction!.toAccountId!);
+      setState(() {
+        selectedDateAndTime = widget.transaction!.date;
+        firstAccount = account;
+        this.secondAccount = secondAccount;
+        isSelected = [false, false, true];
+        _noteController.text = widget.transaction!.notes ?? "";
+      });
+    } else {
+      bool isExpense = widget.transaction!.type.toLowerCase() == "expense";
+      final account =
+          await dbHelper.getAccountWithId(widget.transaction!.accountId);
+      final category =
+          await dbHelper.getCategoryWithId(widget.transaction!.categoryId);
+      setState(() {
+        selectedDateAndTime = widget.transaction!.date;
+        firstAccount = account;
+        this.category = category;
+        amount = widget.transaction!.amount;
+        isExpense
+            ? isSelected = [false, true, false]
+            : isSelected = [true, false, false];
+        _noteController.text = widget.transaction!.notes ?? "";
+      });
+    }
+  }
+
   @override
   void initState() {
     selectedDateAndTime = DateTime.now().toIso8601String();
+    _autoFillIfEdit();
     super.initState();
   }
 
@@ -418,7 +455,8 @@ class _AddPageState extends State<AddPage> {
                             Icons.label,
                             color: AppColors.lightYellow,
                           )
-                        : Image.asset(category!.assetPath),
+                        : Image.asset(
+                            categoryAssetIconList[category!.iconNumber]),
                     label: category == null ? 'Category' : category!.name,
                   ),
               ],
@@ -429,11 +467,13 @@ class _AddPageState extends State<AddPage> {
               onCalculate: (amount) => setState(() {
                 this.amount = amount;
               }),
+              initialAmount: widget.transaction?.amount.abs().toString(),
             ),
             DateTimePickerWidget(
               onDateChanged: (selectedDateAndTime) => setState(() {
                 this.selectedDateAndTime = selectedDateAndTime;
               }),
+              initialDateTime: widget.transaction?.date,
             ),
           ],
         ),
@@ -581,6 +621,7 @@ class _AddPageState extends State<AddPage> {
         type: "transfer");
     dbHelper.transferMoney(transaction);
     context.read<RecordsCubit>().fetchRecords();
+    context.read<AccountsCubit>().fetchAccounts();
     Navigator.pop(context);
   }
 
@@ -621,9 +662,20 @@ class _AddPageState extends State<AddPage> {
         categoryId: category!.id!,
         amount: amount!,
         date: selectedDateAndTime!,
-        type: _buildTrasactionType());
-    dbHelper.insertTransaction(transaction);
-    dbHelper.updateAccountBalance(firstAccount!.id!, amount!);
+        type: _buildTrasactionType(),
+        notes: _noteController.text);
+    bool isEditing = widget.transaction != null;
+    if (isEditing) {
+      final updatedTransaction =
+          transaction.copyWith(id: widget.transaction!.id);
+      double updatedAmount = widget.transaction!.amount - amount!;
+      dbHelper.updateTransaction(updatedTransaction);
+      dbHelper.updateAccountBalance(firstAccount!.id!, updatedAmount);
+    } else {
+      dbHelper.insertTransaction(transaction);
+      dbHelper.updateAccountBalance(firstAccount!.id!, amount!);
+    }
+
     context.read<AccountsCubit>().fetchAccounts();
     context.read<RecordsCubit>().fetchRecords();
     Navigator.pop(context);

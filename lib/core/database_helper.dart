@@ -28,7 +28,12 @@ class DatabaseHelper {
       path,
       version: 1,
       onCreate: _onCreate,
+      onConfigure: _onConfigure,
     );
+  }
+
+  Future<void> _onConfigure(Database db) async {
+    await db.execute('PRAGMA foreign_keys = ON');
   }
 
   Future _onCreate(Database db, int version) async {
@@ -59,6 +64,7 @@ class DatabaseHelper {
       type TEXT,
       notes TEXT,
       FOREIGN KEY(accountId) REFERENCES accounts(id) ON DELETE CASCADE,
+      FOREIGN KEY(toAccountId) REFERENCES accounts(id) ON DELETE CASCADE,
       FOREIGN KEY(categoryId) REFERENCES categories(id) ON DELETE CASCADE
     )
     ''');
@@ -76,7 +82,7 @@ class DatabaseHelper {
     CREATE TABLE categories (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
-      assetPath TEXT,
+      iconNumber INTEGER,
       type TEXT
     )
     ''');
@@ -89,7 +95,7 @@ class DatabaseHelper {
   Future<void> _insertTransactionCategory(Database db) async {
     await db.insert('categories', {
       'name': 'Transfer',
-      'assetPath': 'assets/icons/transfer.png',
+      'iconNumber': '34',
       'type': 'transfer'
     });
   }
@@ -166,7 +172,7 @@ class DatabaseHelper {
       await txn.insert('transactions', {
         'accountId': fromAccountId,
         'toAccountId': toAccountId,
-        'categoryId': 0,
+        'categoryId': 1,
         'amount': amountToTransfer,
         'date': DateTime.now().toIso8601String(),
         'type': 'TRANSFER',
@@ -293,6 +299,91 @@ class DatabaseHelper {
   Future<int> insertTransaction(Transaction transaction) async {
     final db = await database;
     return await db.insert('transactions', transaction.toMap());
+  }
+
+  Future<int> updateTransaction(Transaction transaction) async {
+    final db = await database;
+
+    return await db.update(
+      'transactions',
+      transaction.toMap(),
+      where: 'id = ?',
+      whereArgs: [transaction.id],
+    );
+  }
+
+  Future<void> deleteTransaction(int transactionId) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      final List<Map<String, dynamic>> transactionResult = await txn.query(
+        'transactions',
+        where: 'id = ?',
+        whereArgs: [transactionId],
+        limit: 1,
+      );
+
+      if (transactionResult.isEmpty) {
+        throw Exception('Transaction with ID $transactionId not found');
+      }
+
+      final transaction = Transaction.fromMap(transactionResult.first);
+      final List<Map<String, dynamic>> fromAccountResult = await txn.query(
+        'accounts',
+        columns: ['balance'],
+        where: 'id = ?',
+        whereArgs: [transaction.accountId],
+        limit: 1,
+      );
+
+      if (fromAccountResult.isEmpty) {
+        throw Exception('Account with ID ${transaction.accountId} not found');
+      }
+
+      final double fromAccountBalance =
+          fromAccountResult.first['balance'] as double;
+      final double updatedFromAccountBalance =
+          fromAccountBalance - transaction.amount;
+
+      await txn.update(
+        'accounts',
+        {'balance': updatedFromAccountBalance},
+        where: 'id = ?',
+        whereArgs: [transaction.accountId],
+      );
+
+      if (transaction.type == 'TRANSFER' && transaction.toAccountId != null) {
+        final List<Map<String, dynamic>> toAccountResult = await txn.query(
+          'accounts',
+          columns: ['balance'],
+          where: 'id = ?',
+          whereArgs: [transaction.toAccountId],
+          limit: 1,
+        );
+
+        if (toAccountResult.isEmpty) {
+          throw Exception(
+              'Account with ID ${transaction.toAccountId} not found');
+        }
+
+        final double toAccountBalance =
+            toAccountResult.first['balance'] as double;
+        final double updatedToAccountBalance =
+            toAccountBalance + transaction.amount;
+
+        await txn.update(
+          'accounts',
+          {'balance': updatedToAccountBalance},
+          where: 'id = ?',
+          whereArgs: [transaction.toAccountId],
+        );
+      }
+
+      await txn.delete(
+        'transactions',
+        where: 'id = ?',
+        whereArgs: [transactionId],
+      );
+    });
   }
 
   Future<List<Transaction>> getTransactionsByAccount(int accountId) async {

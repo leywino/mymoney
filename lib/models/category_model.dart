@@ -1,16 +1,16 @@
 class Category {
   final int? id;
   final String name;
-  final String assetPath;
+  final int iconNumber;
   final String type;
 
-  Category({this.id, required this.name, required this.assetPath, required this.type});
+  Category({this.id, required this.name, required this.iconNumber, required this.type});
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
-      'assetPath': assetPath,
+      'iconNumber': iconNumber,
       'type': type,
     };
   }
@@ -19,7 +19,7 @@ class Category {
     return Category(
       id: map['id'],
       name: map['name'],
-      assetPath: map['assetPath'],
+      iconNumber: map['iconNumber'],
       type: map['type'],
     );
   }

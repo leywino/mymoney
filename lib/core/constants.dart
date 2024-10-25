@@ -59,178 +59,81 @@ List<String> accountsAssetIconList = [
   'assets/icons/account/wallet.png',
 ];
 
-const List<Map<String, String>> expenseCategories = [
-  {
-    'name': 'Baby',
-    'assetPath': 'assets/icons/expense/baby.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Beauty',
-    'assetPath': 'assets/icons/expense/beauty.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Bicycle',
-    'assetPath': 'assets/icons/expense/bicycle.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Bike',
-    'assetPath': 'assets/icons/expense/bike.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Bills',
-    'assetPath': 'assets/icons/expense/bills.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Car',
-    'assetPath': 'assets/icons/expense/car.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Clothing',
-    'assetPath': 'assets/icons/expense/clothing.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Education',
-    'assetPath': 'assets/icons/expense/education.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Electronics',
-    'assetPath': 'assets/icons/expense/electronics.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'EMI',
-    'assetPath': 'assets/icons/expense/emi.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Entertainment',
-    'assetPath': 'assets/icons/expense/entertainment.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Fuel',
-    'assetPath': 'assets/icons/expense/fuel.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Food',
-    'assetPath': 'assets/icons/expense/food.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Gadgets',
-    'assetPath': 'assets/icons/expense/gadgets.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Gym',
-    'assetPath': 'assets/icons/expense/gym.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Health',
-    'assetPath': 'assets/icons/expense/health.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Home',
-    'assetPath': 'assets/icons/expense/home.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Insurance',
-    'assetPath': 'assets/icons/expense/insurance.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Shopping',
-    'assetPath': 'assets/icons/expense/shopping.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Social',
-    'assetPath': 'assets/icons/expense/social.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Sports',
-    'assetPath': 'assets/icons/expense/sports.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Subscriptions',
-    'assetPath': 'assets/icons/expense/subscriptions.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Tax',
-    'assetPath': 'assets/icons/expense/tax.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Telephone',
-    'assetPath': 'assets/icons/expense/telephone.png',
-    'type': 'expense'
-  },
-  {
-    'name': 'Transportation',
-    'assetPath': 'assets/icons/expense/transportation.png',
-    'type': 'expense'
-  },
+List<String> categoryAssetIconList = [
+  'assets/icons/expense/baby.png',
+  'assets/icons/expense/beauty.png',
+  'assets/icons/expense/bicycle.png',
+  'assets/icons/expense/bike.png',
+  'assets/icons/expense/bills.png',
+  'assets/icons/expense/car.png',
+  'assets/icons/expense/clothing.png',
+  'assets/icons/expense/education.png',
+  'assets/icons/expense/electronics.png',
+  'assets/icons/expense/emi.png',
+  'assets/icons/expense/entertainment.png',
+  'assets/icons/expense/fuel.png',
+  'assets/icons/expense/food.png',
+  'assets/icons/expense/gadgets.png',
+  'assets/icons/expense/gym.png',
+  'assets/icons/expense/health.png',
+  'assets/icons/expense/home.png',
+  'assets/icons/expense/insurance.png',
+  'assets/icons/expense/shopping.png',
+  'assets/icons/expense/social.png',
+  'assets/icons/expense/sports.png',
+  'assets/icons/expense/subscriptions.png',
+  'assets/icons/expense/tax.png',
+  'assets/icons/expense/telephone.png',
+  'assets/icons/expense/transportation.png',
+  'assets/icons/income/awards.png',
+  'assets/icons/income/coupons.png',
+  'assets/icons/income/grants.png',
+  'assets/icons/income/lottery.png',
+  'assets/icons/income/receiving.png',
+  'assets/icons/income/refunds.png',
+  'assets/icons/income/rental.png',
+  'assets/icons/income/salary.png',
+  'assets/icons/income/sale.png',
+  'assets/icons/transfer.png'
 ];
 
-const List<Map<String, String>> incomeCategories = [
-  {
-    'name': 'Awards',
-    'assetPath': 'assets/icons/income/awards.png',
-    'type': 'income'
-  },
-  {
-    'name': 'Coupons',
-    'assetPath': 'assets/icons/income/coupons.png',
-    'type': 'income'
-  },
-  {
-    'name': 'Grants',
-    'assetPath': 'assets/icons/income/grants.png',
-    'type': 'income'
-  },
-  {
-    'name': 'Lottery',
-    'assetPath': 'assets/icons/income/lottery.png',
-    'type': 'income'
-  },
-  {
-    'name': 'Receiving',
-    'assetPath': 'assets/icons/income/receiving.png',
-    'type': 'income'
-  },
-  {
-    'name': 'Refunds',
-    'assetPath': 'assets/icons/income/refunds.png',
-    'type': 'income'
-  },
-  {
-    'name': 'Rental',
-    'assetPath': 'assets/icons/income/rental.png',
-    'type': 'income'
-  },
-  {
-    'name': 'Salary',
-    'assetPath': 'assets/icons/income/salary.png',
-    'type': 'income'
-  },
-  {
-    'name': 'Sale',
-    'assetPath': 'assets/icons/income/sale.png',
-    'type': 'income'
-  },
+const List<Map<String, dynamic>> expenseCategories = [
+  {'name': 'Baby', 'iconNumber': 0, 'type': 'expense'},
+  {'name': 'Beauty', 'iconNumber': 1, 'type': 'expense'},
+  {'name': 'Bicycle', 'iconNumber': 2, 'type': 'expense'},
+  {'name': 'Bike', 'iconNumber': 3, 'type': 'expense'},
+  {'name': 'Bills', 'iconNumber': 4, 'type': 'expense'},
+  {'name': 'Car', 'iconNumber': 5, 'type': 'expense'},
+  {'name': 'Clothing', 'iconNumber': 6, 'type': 'expense'},
+  {'name': 'Education', 'iconNumber': 7, 'type': 'expense'},
+  {'name': 'Electronics', 'iconNumber': 8, 'type': 'expense'},
+  {'name': 'EMI', 'iconNumber': 9, 'type': 'expense'},
+  {'name': 'Entertainment', 'iconNumber': 10, 'type': 'expense'},
+  {'name': 'Fuel', 'iconNumber': 11, 'type': 'expense'},
+  {'name': 'Food', 'iconNumber': 12, 'type': 'expense'},
+  {'name': 'Gadgets', 'iconNumber': 13, 'type': 'expense'},
+  {'name': 'Gym', 'iconNumber': 14, 'type': 'expense'},
+  {'name': 'Health', 'iconNumber': 15, 'type': 'expense'},
+  {'name': 'Home', 'iconNumber': 16, 'type': 'expense'},
+  {'name': 'Insurance', 'iconNumber': 17, 'type': 'expense'},
+  {'name': 'Shopping', 'iconNumber': 18, 'type': 'expense'},
+  {'name': 'Social', 'iconNumber': 19, 'type': 'expense'},
+  {'name': 'Sports', 'iconNumber': 20, 'type': 'expense'},
+  {'name': 'Subscriptions', 'iconNumber': 21, 'type': 'expense'},
+  {'name': 'Tax', 'iconNumber': 22, 'type': 'expense'},
+  {'name': 'Telephone', 'iconNumber': 23, 'type': 'expense'},
+  {'name': 'Transportation', 'iconNumber': 24, 'type': 'expense'},
+];
+
+// Updated income categories with `iconNumber`
+const List<Map<String, dynamic>> incomeCategories = [
+  {'name': 'Awards', 'iconNumber': 25, 'type': 'income'},
+  {'name': 'Coupons', 'iconNumber': 26, 'type': 'income'},
+  {'name': 'Grants', 'iconNumber': 27, 'type': 'income'},
+  {'name': 'Lottery', 'iconNumber': 28, 'type': 'income'},
+  {'name': 'Receiving', 'iconNumber': 29, 'type': 'income'},
+  {'name': 'Refunds', 'iconNumber': 30, 'type': 'income'},
+  {'name': 'Rental', 'iconNumber': 31, 'type': 'income'},
+  {'name': 'Salary', 'iconNumber': 32, 'type': 'income'},
+  {'name': 'Sale', 'iconNumber': 33, 'type': 'income'},
 ];
