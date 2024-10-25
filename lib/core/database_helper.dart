@@ -93,11 +93,8 @@ class DatabaseHelper {
   }
 
   Future<void> _insertTransactionCategory(Database db) async {
-    await db.insert('categories', {
-      'name': 'Transfer',
-      'iconNumber': '34',
-      'type': 'transfer'
-    });
+    await db.insert('categories',
+        {'name': 'Transfer', 'iconNumber': '34', 'type': 'transfer'});
   }
 
   Future<void> _insertExpenseCategories(Database db) async {
@@ -180,13 +177,37 @@ class DatabaseHelper {
     });
   }
 
-  Future<List<Map<String, dynamic>>> getCategoriesByType(String type) async {
+  Future<List<Map<String, dynamic>>> getCategoriesByTypeMap(String type) async {
     final db = await database;
     return await db.query(
       'categories',
       where: 'type = ?',
       whereArgs: [type],
     );
+  }
+
+  Future<List<Budgeting>> getAllBudgets() async {
+  final db = await database;
+  
+  final List<Map<String, dynamic>> result = await db.query('budgeting');
+
+  return List.generate(result.length, (index) {
+    return Budgeting.fromMap(result[index]);
+  });
+}
+
+  Future<List<Category>> getCategoriesByTypeList(String type) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> result = await db.query(
+      'categories',
+      where: 'type = ?',
+      whereArgs: [type],
+    );
+
+    return List.generate(result.length, (index) {
+      return Category.fromMap(result[index]);
+    });
   }
 
   Future<int> insertAccount(Account account) async {

@@ -1,30 +1,29 @@
 class Budgeting {
   final int? id;
-  final String category;
+  final int categoryId;
   final double budgetAmount;
-  final double spentAmount;
 
-  Budgeting(
-      {this.id,
-      required this.category,
-      required this.budgetAmount,
-      this.spentAmount = 0});
+  Budgeting({
+    this.id,
+    required this.categoryId,
+    required this.budgetAmount,
+  });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'category': category,
-      'budgetAmount': budgetAmount,
-      'spentAmount': spentAmount,
-    };
-  }
-
+  // Factory constructor to create a Budgeting object from a map
   factory Budgeting.fromMap(Map<String, dynamic> map) {
     return Budgeting(
       id: map['id'],
-      category: map['category'],
+      categoryId: map['categoryId'],
       budgetAmount: map['budgetAmount'],
-      spentAmount: map['spentAmount'],
     );
+  }
+
+  // Method to convert a Budgeting object to a map
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'categoryId': categoryId,
+      'budgetAmount': budgetAmount,
+    };
   }
 }

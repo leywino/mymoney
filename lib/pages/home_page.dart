@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:mymoney/components/budget_date_range_picker.dart';
 import 'package:mymoney/components/date_range_picker.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/pages/accounts_page.dart';
 import 'package:mymoney/pages/add_page.dart';
 import 'package:mymoney/pages/analysis_page.dart';
+import 'package:mymoney/pages/budgets_page.dart';
 import 'package:mymoney/pages/records_page.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -17,47 +19,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  bool _isFabVisible = true;
-  final ScrollController _scrollController = ScrollController();
+  final bool _isFabVisible = true;
 
-  // Placeholder widgets for the different pages
   List<Widget> _pages = [];
 
   @override
   void initState() {
     super.initState();
-    // Add listener to ScrollController
-    _scrollController.addListener(() {
-      if (_scrollController.position.userScrollDirection ==
-          ScrollDirection.reverse) {
-        if (_isFabVisible) {
-          setState(() {
-            _isFabVisible = false;
-          });
-        }
-      } else if (_scrollController.position.userScrollDirection ==
-          ScrollDirection.forward) {
-        if (!_isFabVisible) {
-          setState(() {
-            _isFabVisible = true;
-          });
-        }
-      }
-    });
 
     _pages = <Widget>[
-      RecordsPage(scrollController: _scrollController),
+      const RecordsPage(),
       const AnalysisPage(),
-      const Text('Budgets Page'),
-      AccountsPage(scrollController: _scrollController),
+      const BudgetsPage(),
+      const AccountsPage(),
       const Text('Categories Page'),
     ];
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   void _onItemTapped(int index) {
@@ -159,7 +135,7 @@ class _HomePageState extends State<HomePage> {
       case 1:
         return const DateRangePicker();
       case 2:
-        return null;
+        return const BudgetDateRangePicker();
       case 3:
         return null;
       case 4:

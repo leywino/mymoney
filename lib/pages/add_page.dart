@@ -125,7 +125,7 @@ class _AddPageState extends State<AddPage> {
   Future<Category?> _showCategorySelection(String type) async {
     final dbHelper = DatabaseHelper();
     List<Map<String, dynamic>> categories =
-        await dbHelper.getCategoriesByType(type);
+        await dbHelper.getCategoriesByTypeMap(type);
 
     if (!mounted) return null;
 

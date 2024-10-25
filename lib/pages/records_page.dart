@@ -13,9 +13,8 @@ import 'package:mymoney/models/category_model.dart';
 import 'package:mymoney/models/transaction_model.dart';
 
 class RecordsPage extends StatelessWidget {
-  const RecordsPage({super.key, required this.scrollController});
+  const RecordsPage({super.key });
 
-  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +39,7 @@ class RecordsPage extends StatelessWidget {
             }
 
             return ListView.builder(
-              controller: scrollController,
+
               shrinkWrap: true,
               itemCount: groupedTransactions.length,
               itemBuilder: (context, index) {

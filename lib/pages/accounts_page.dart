@@ -8,9 +8,9 @@ import 'package:mymoney/core/constants.dart';
 import 'package:mymoney/models/account_model.dart';
 
 class AccountsPage extends StatefulWidget {
-  const AccountsPage({super.key, required this.scrollController});
+  const AccountsPage({super.key});
 
-  final ScrollController scrollController;
+
 
   @override
   State<AccountsPage> createState() => _AccountsPageState();
@@ -47,7 +47,7 @@ class _AccountsPageState extends State<AccountsPage> {
                     final accounts = state.accounts;
                     return ListView.builder(
                       shrinkWrap: true,
-                      controller: widget.scrollController,
+    
                       itemCount: accounts.length,
                       itemBuilder: (context, index) {
                         final account = accounts[index];

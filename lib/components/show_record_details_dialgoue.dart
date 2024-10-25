@@ -40,7 +40,6 @@ Future<void> showRecordDetailsDialog(
             } else if (!snapshot.hasData || snapshot.data == null) {
               return const Center(child: Text('No details found'));
             }
-
             final Account? account = snapshot.data![0];
             final categoryOrAccount = snapshot.data![1];
             final formattedDate = DateFormat('MMM dd, yyyy h:mm a')
@@ -52,12 +51,10 @@ Future<void> showRecordDetailsDialog(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top part with Expense type and amount
                 Stack(
                   children: [
                     Container(
-                      width: double
-                          .infinity, // Ensure the container takes full width
+                      width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       decoration: const BoxDecoration(
                         color: AppColors.gold, // top part color
@@ -144,8 +141,6 @@ Future<void> showRecordDetailsDialog(
                   ],
                 ),
                 const SizedBox(height: 16),
-
-                // Account and Category details
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
@@ -193,8 +188,6 @@ Future<void> showRecordDetailsDialog(
                         ],
                       ),
                       const SizedBox(height: 16),
-
-                      // Category row
                       Row(
                         children: [
                           Text(
@@ -241,8 +234,6 @@ Future<void> showRecordDetailsDialog(
                         ],
                       ),
                       const SizedBox(height: 16),
-
-                      // Notes
                       if (transaction.notes != null &&
                           transaction.notes!.isNotEmpty)
                         Text(
@@ -255,7 +246,6 @@ Future<void> showRecordDetailsDialog(
                           'No notes',
                           style: TextStyle(color: AppColors.secondaryText),
                         ),
-
                       Box.h40,
                     ],
                   ),
