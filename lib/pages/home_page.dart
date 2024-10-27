@@ -48,10 +48,7 @@ class _HomePageState extends State<HomePage> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: AppColors.darkGray,
-      appBar: AppBar(
-        backgroundColor: AppColors.darkGray,
-        title: _buildAppBar(),
-      ),
+      appBar: _buildAppBar(),
       body: IndexedStack(
         index: _selectedIndex,
         children: _pages,
@@ -129,14 +126,20 @@ class _HomePageState extends State<HomePage> {
             child: const AddPage()));
   }
 
-  Widget? _buildAppBar() {
+  AppBar? _buildAppBar() {
     switch (_selectedIndex) {
       case 0:
-        return const DateRangePicker();
+        return AppBar(
+            backgroundColor: AppColors.darkGray,
+            title: const DateRangePicker());
       case 1:
-        return const DateRangePicker();
+        return AppBar(
+            backgroundColor: AppColors.darkGray,
+            title: const DateRangePicker());
       case 2:
-        return const BudgetDateRangePicker();
+        return AppBar(
+            backgroundColor: AppColors.darkGray,
+            title: const BudgetDateRangePicker());
       case 3:
         return null;
       case 4:

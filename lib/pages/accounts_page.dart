@@ -10,8 +10,6 @@ import 'package:mymoney/models/account_model.dart';
 class AccountsPage extends StatefulWidget {
   const AccountsPage({super.key});
 
-
-
   @override
   State<AccountsPage> createState() => _AccountsPageState();
 }
@@ -47,7 +45,6 @@ class _AccountsPageState extends State<AccountsPage> {
                     final accounts = state.accounts;
                     return ListView.builder(
                       shrinkWrap: true,
-    
                       itemCount: accounts.length,
                       itemBuilder: (context, index) {
                         final account = accounts[index];
@@ -60,7 +57,7 @@ class _AccountsPageState extends State<AccountsPage> {
                 },
               ),
               const SizedBox(height: 16),
-              _buildAddNewAccountButton(context),
+              Center(child: _buildAddNewAccountButton(context)),
             ],
           ),
         ),
@@ -152,13 +149,14 @@ class _AccountsPageState extends State<AccountsPage> {
       ),
     );
 
-    if (shouldDelete == true) {
-      await context.read<AccountsCubit>().deleteAccount(account.id!);
+    if (shouldDelete == true && context.mounted) {
+      context.read<AccountsCubit>().deleteAccount(account.id!);
       context.read<AccountsCubit>().fetchAccounts();
     }
   }
 
   Widget _buildAddNewAccountButton(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () async {
         final isAdded = await showAddAccountDialog(context);
@@ -168,8 +166,8 @@ class _AccountsPageState extends State<AccountsPage> {
         }
       },
       child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        width: size.width * 0.6,
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: Colors.transparent,
           border: Border.all(color: AppColors.lightYellow, width: 1),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mymoney/components/show_add_category_dialogue.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
 import 'package:mymoney/core/database_helper.dart';
@@ -33,53 +34,58 @@ class _CategoriesPageState extends State<CategoriesPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Scaffold(
-      backgroundColor: AppColors.darkGray,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Income categories section
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Income categories',
-                      style: TextStyle(
-                        color: AppColors.lightYellow,
-                        fontWeight: FontWeight.bold,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: AppColors.darkGray,
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Income categories section
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Income categories',
+                        style: TextStyle(
+                          color: AppColors.lightYellow,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.start,
                       ),
-                      textAlign: TextAlign.start,
-                    ),
-                    Divider(color: AppColors.lightYellow),
-                  ],
+                      Divider(color: AppColors.lightYellow),
+                    ],
+                  ),
                 ),
-              ),
-              _buildFutureCategoryList(_incomeCategoriesFuture),
-              const SizedBox(height: 20),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Expense categories',
-                      style: TextStyle(
-                        color: AppColors.lightYellow,
-                        fontWeight: FontWeight.bold,
+                _buildFutureCategoryList(_incomeCategoriesFuture),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Expense categories',
+                        style: TextStyle(
+                          color: AppColors.lightYellow,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.start,
                       ),
-                      textAlign: TextAlign.start,
-                    ),
-                    Divider(color: AppColors.lightYellow),
-                  ],
+                      Divider(color: AppColors.lightYellow),
+                    ],
+                  ),
                 ),
-              ),
-              _buildFutureCategoryList(_expenseCategoriesFuture),
-            ],
+                _buildFutureCategoryList(_expenseCategoriesFuture),
+                Center(
+                  child: _buildAddNewCategoryButton(context),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -180,6 +186,43 @@ class _CategoriesPageState extends State<CategoriesPage> {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildAddNewCategoryButton(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return GestureDetector(
+      onTap: () async {
+        final isAdded = await showAddCategoryDialog(context);
+        // if (isAdded) {
+        //   if (!context.mounted) return;
+        //   context.read<AccountsCubit>().fetchAccounts();
+        // }
+      },
+      child: Container(
+        width: size.width * 0.6,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          border: Border.all(color: AppColors.lightYellow, width: 1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add, color: AppColors.lightYellow),
+            SizedBox(width: 8),
+            Text(
+              'ADD NEW CATEGORY',
+              style: TextStyle(
+                color: AppColors.lightYellow,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
