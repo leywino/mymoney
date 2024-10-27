@@ -31,6 +31,14 @@ class _CategoriesPageState extends State<CategoriesPage> {
     return await DatabaseHelper().getCategoriesByTypeList('expense');
   }
 
+  void refreshCategories() async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    setState(() {
+      _incomeCategoriesFuture = _fetchIncomeCategories();
+      _expenseCategoriesFuture = _fetchExpenseCategories();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -194,10 +202,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
     return GestureDetector(
       onTap: () async {
         final isAdded = await showAddCategoryDialog(context);
-        // if (isAdded) {
-        //   if (!context.mounted) return;
-        //   context.read<AccountsCubit>().fetchAccounts();
-        // }
+        if (isAdded) {
+          refreshCategories();
+        }
       },
       child: Container(
         width: size.width * 0.6,

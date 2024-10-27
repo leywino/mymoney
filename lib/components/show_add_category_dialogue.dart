@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
+import 'package:mymoney/core/database_helper.dart';
+import 'package:mymoney/models/category_model.dart';
 
 Future<bool> showAddCategoryDialog(BuildContext context) async {
   String categoryName = '';
@@ -181,10 +183,14 @@ Future<bool> showAddCategoryDialog(BuildContext context) async {
                   TextButton(
                     onPressed: () {
                       if (categoryName.isNotEmpty) {
-                        // Implement logic to save the category
+                        DatabaseHelper().addCategory(
+                          Category(
+                              name: categoryName,
+                              iconNumber: selectedIconIndex,
+                              type: isExpense ? 'expense' : 'income'),
+                        );
                         Navigator.pop(context, true);
                       } else {
-                        // Show a message if the name is empty
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Please enter a category name.'),

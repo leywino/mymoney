@@ -187,14 +187,14 @@ class DatabaseHelper {
   }
 
   Future<List<Budgeting>> getAllBudgets() async {
-  final db = await database;
-  
-  final List<Map<String, dynamic>> result = await db.query('budgeting');
+    final db = await database;
 
-  return List.generate(result.length, (index) {
-    return Budgeting.fromMap(result[index]);
-  });
-}
+    final List<Map<String, dynamic>> result = await db.query('budgeting');
+
+    return List.generate(result.length, (index) {
+      return Budgeting.fromMap(result[index]);
+    });
+  }
 
   Future<List<Category>> getCategoriesByTypeList(String type) async {
     final db = await database;
@@ -222,6 +222,23 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [accountId],
     );
+  }
+
+  Future<int> addCategory(Category category) async {
+    final db = await database;
+    final List<Map<String, dynamic>> existingCategory = await db.query(
+      'categories',
+      where: 'name = ?',
+      whereArgs: [category.name],
+      limit: 1,
+    );
+
+    if (existingCategory.isNotEmpty) {
+      throw Exception(
+          'Category with the name "${category.name}" already exists.');
+    }
+
+    return await db.insert('categories', category.toMap());
   }
 
   Future<Category?> getCategoryWithId(int categoryId) async {
