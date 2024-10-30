@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mymoney/bloc/budgets_cubit/budgets_cubit.dart';
+import 'package:mymoney/components/show_set_budget_dialogue.dart';
 import 'package:mymoney/core/color.dart';
 import 'package:mymoney/core/constants.dart';
+import 'package:mymoney/core/database_helper.dart';
+import 'package:mymoney/models/budgeting_model.dart';
+import 'package:mymoney/models/category_model.dart';
 
 class BudgetsPage extends StatefulWidget {
   const BudgetsPage({super.key});
 
   @override
   State<BudgetsPage> createState() => _BudgetsPageState();
-
-
 }
 
 class _BudgetsPageState extends State<BudgetsPage> {
@@ -28,7 +30,6 @@ class _BudgetsPageState extends State<BudgetsPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
- 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -94,12 +95,12 @@ class _BudgetsPageState extends State<BudgetsPage> {
 
           return Column(
             children: state.budgets.map((budgetData) {
-              final budget = budgetData['budget'];
+              final budget = budgetData['budget'] as Budgeting;
               final spentAmount = budgetData['spentAmount'];
               final remainingAmount = budgetData['remainingAmount'];
 
-              return _buildBudgetCard(
-                  budget.categoryId, spentAmount, remainingAmount);
+              return _buildBudgetCard(budget.categoryId, budget.budgetAmount,
+                  spentAmount, remainingAmount);
             }).toList(),
           );
         } else if (state is BudgetsError) {
@@ -111,8 +112,10 @@ class _BudgetsPageState extends State<BudgetsPage> {
     );
   }
 
-  Widget _buildBudgetCard(
-      int categoryId, double spentAmount, double remainingAmount) {
+  Widget _buildBudgetCard(int categoryId, double budgetAmount,
+      double spentAmount, double remainingAmount) {
+    final databaseHelper = DatabaseHelper();
+
     return Card(
       color: AppColors.customOliveGray,
       shape: RoundedRectangleBorder(
@@ -125,50 +128,101 @@ class _BudgetsPageState extends State<BudgetsPage> {
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  backgroundColor: AppColors.lightYellow,
-                  radius: 24,
-                  child: Image.asset('assets/icons/expense/clothing.png'),
+                // Fetch and display the category icon
+                FutureBuilder<Category?>(
+                  future: databaseHelper.getCategoryWithId(categoryId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Colors.grey,
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return const CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Colors.red,
+                        child: Icon(Icons.error),
+                      );
+                    } else if (snapshot.hasData && snapshot.data != null) {
+                      final category = snapshot.data!;
+                      return CircleAvatar(
+                        radius: 24,
+                        backgroundImage: AssetImage(
+                            categoryAssetIconList[category.iconNumber]),
+                      );
+                    } else {
+                      return const CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Colors.grey,
+                        child: Icon(Icons.category),
+                      );
+                    }
+                  },
                 ),
                 const SizedBox(width: 12),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Clothing',
-                      style: TextStyle(
-                        color: AppColors.lightYellow,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      '(Oct, 2024)',
-                      style: TextStyle(
-                        color: AppColors.secondaryText,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+
+                // Display category name and current month
+                FutureBuilder<Category?>(
+                  future: databaseHelper.getCategoryWithId(categoryId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const SizedBox.shrink();
+                    } else if (snapshot.hasError) {
+                      return const Text("Error loading category",
+                          style: TextStyle(color: Colors.red));
+                    } else if (snapshot.hasData && snapshot.data != null) {
+                      final category = snapshot.data!;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            category.name,
+                            style: const TextStyle(
+                              color: AppColors.lightYellow,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            '(${DateFormat.MMM().format(DateTime.now())}, ${DateTime.now().year})',
+                            style: const TextStyle(
+                              color: AppColors.secondaryText,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return const Text("Unknown Category",
+                          style: TextStyle(color: Colors.grey));
+                    }
+                  },
                 ),
+
                 const Spacer(),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // Add options like edit or delete budget
+                  },
                   icon:
                       const Icon(Icons.more_vert, color: AppColors.lightYellow),
                 ),
               ],
             ),
             const SizedBox(height: 12),
+
+            // Display budget, spent, and remaining amounts
             Row(
               children: [
-                const Text(
-                  'Limit: ₹500.00',
-                  style: TextStyle(color: AppColors.lightYellow, fontSize: 14),
+                Text(
+                  'Limit: ₹${budgetAmount.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                      color: AppColors.lightYellow, fontSize: 14),
                 ),
                 const Spacer(),
                 Text(
-                  'Remaining: ₹$remainingAmount',
+                  'Remaining: ₹${remainingAmount.toStringAsFixed(2)}',
                   style: const TextStyle(
                       color: AppColors.lightYellow, fontSize: 14),
                 ),
@@ -176,12 +230,13 @@ class _BudgetsPageState extends State<BudgetsPage> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Spent: ₹$spentAmount',
+              'Spent: ₹${spentAmount.toStringAsFixed(2)}',
               style:
                   const TextStyle(color: AppColors.secondaryText, fontSize: 12),
             ),
             const SizedBox(height: 12),
-            // Progress bar
+
+            // Progress bar indicating budget usage
             Stack(
               children: [
                 Container(
@@ -193,7 +248,7 @@ class _BudgetsPageState extends State<BudgetsPage> {
                 ),
                 Container(
                   height: 10,
-                  width: _calculateProgressBarWidth(spentAmount, 500),
+                  width: _calculateProgressBarWidth(spentAmount, budgetAmount),
                   decoration: BoxDecoration(
                     color: AppColors.lightYellow,
                     borderRadius: BorderRadius.circular(5),
@@ -221,8 +276,8 @@ class _BudgetsPageState extends State<BudgetsPage> {
           }
           return Column(
             children: state.nonBudgetedCategories.map((category) {
-              return _buildNotBudgetedCategoryCard(
-                  category.name, categoryAssetIconList[category.iconNumber]);
+              return _buildNotBudgetedCategoryCard(category.name,
+                  categoryAssetIconList[category.iconNumber], category.id!);
             }).toList(),
           );
         } else if (state is BudgetsLoading) {
@@ -234,7 +289,8 @@ class _BudgetsPageState extends State<BudgetsPage> {
     );
   }
 
-  Widget _buildNotBudgetedCategoryCard(String name, String icon) {
+  Widget _buildNotBudgetedCategoryCard(
+      String name, String icon, int categoryId) {
     return Card(
       color: Colors.transparent,
       elevation: 0,
@@ -258,8 +314,7 @@ class _BudgetsPageState extends State<BudgetsPage> {
         ),
         trailing: ElevatedButton(
           onPressed: () {
-            // Handle Set Budget action
-            _setBudgetForCategory(name);
+            _setBudgetForCategory(name, icon, categoryId);
           },
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -282,8 +337,13 @@ class _BudgetsPageState extends State<BudgetsPage> {
     );
   }
 
-  void _setBudgetForCategory(String categoryName) {
-    // Implement logic for setting a budget for the category
+  void _setBudgetForCategory(
+      String categoryName, String iconPath, int categoryId) async {
+    final isAdded =
+        await showSetBudgetDialog(context, categoryName, iconPath, categoryId);
+    if (isAdded) {
+      setState(() {});
+    }
   }
 
   String _getMonthName(int month) {

@@ -72,9 +72,8 @@ class DatabaseHelper {
     await db.execute('''
     CREATE TABLE budgeting (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      category TEXT,
-      budgetAmount REAL,
-      spentAmount REAL
+      categoryId INTEGER,
+      budgetAmount REAL
     )
     ''');
 
